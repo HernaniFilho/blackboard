@@ -15,18 +15,20 @@ import SwapHorizOutlinedIcon from "@mui/icons-material/SwapHorizOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import DehazeOutlinedIcon from "@mui/icons-material/DehazeOutlined";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
+import useStore from "./state/store";
 
 export default function TemporaryDrawer() {
   const [open, setOpen] = React.useState(false);
-  const [selectedItem, setSelectedItem] = React.useState(null);
+
+  const setEscolha = useStore((state) => state.setEscolha);
 
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
 
   const handleMenuItemClick = (index) => {
-    setSelectedItem(index);
-    setOpen(false); // close the drawer after selecting an item
+    setEscolha(index);
+    setOpen(false);
   };
 
   const menuItems = [
@@ -64,22 +66,6 @@ export default function TemporaryDrawer() {
       </List>
     </Box>
   );
-  const renderMainContent = () => {
-    switch (selectedItem) {
-      case 1:
-        return <div></div>;
-      case 2:
-        return <div></div>;
-      case 3:
-        return <div></div>;
-      case 4:
-        return <div></div>;
-      case 5:
-        return <div></div>;
-      default:
-        return <div></div>;
-    }
-  };
 
   return (
     <div>
@@ -89,9 +75,6 @@ export default function TemporaryDrawer() {
       <Drawer open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
-      <div style={{ marginLeft: 100, marginTop: 10 }}>
-        {renderMainContent()}
-      </div>
     </div>
   );
 }
