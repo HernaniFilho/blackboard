@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install-all": "concurrently \"cd BlackBoard_Back && npm install\" \"cd Gerenciador && npm install\" \"cd Loja_Varejo_1 && npm install\" \"cd Loja_Varejo_2 && npm install\" "
+    "install-all": "concurrently \"cd BlackBoard_Back && npm install\" \"cd Gerenciador && npm install\" \"cd Loja_Varejo_1 && npm install\" \"cd Loja_Varejo_2 && npm install\" ",
+    "GER-BACK":"concurrently \"cd Gerenciador && npm run dev\" \"cd BlackBoard_Back && npm run start\"",
+    "LJ1-BACK":"concurrently \"cd Loja_Varejo_1 && npm run dev\" \"cd BlackBoard_Back && npm run start\"",
+    "start":"concurrently \"cd Gerenciador && npm run dev\" \"cd Loja_Varejo_1 && npm run dev\" \"cd Loja_Varejo_2 && npm run dev\"  \"cd BlackBoard_Back && npm run start\""
+
   },
   "author": "",
   "license": "ISC",
