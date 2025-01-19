@@ -40,3 +40,9 @@
 .read-the-docs {
   color: #888;
 }
+
+.top-left {
+  position: absolute;
+  top: 15px;
+  left: 10px;
+}
