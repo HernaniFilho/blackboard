@@ -20,7 +20,7 @@ const app = express(); // Create an Express app
 // Middleware to parse JSON requests
 app.use(express.json());
 // Middlewarte CORS
-app.use(cors);
+//app.use(cors);
 
 // Connect to moongose
 mongoose
