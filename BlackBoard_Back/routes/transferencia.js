@@ -15,7 +15,7 @@ router.post('/',  async (req, res)=> {
     }
 });
 
-// Listar transferencia
+// Listar transferencia // ola
 router.get('/', async (req, res)=> {
     try {
         const transferencias = await Transferencia.find();

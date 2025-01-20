@@ -15,7 +15,7 @@ router.post('/', async (req, res)=> {
     }
 });
 
-// Listar produtos
+// Listar produtos // ola
 router.get('/', async (req, res)=> {
     try {
         const produtos = await Produto.find();

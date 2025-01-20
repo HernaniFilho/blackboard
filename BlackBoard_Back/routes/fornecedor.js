@@ -15,7 +15,7 @@ router.post('/', async (req, res)=> {
     }
 });
 
-// Listar fornecedores
+// Listar fornecedores // ola
 router.get('/', async (req, res)=> {
     try {
         const fornecedores = await Fornecedor.find();
