@@ -16,7 +16,7 @@ router.post('/', async (req, res)=> {
 });
 
 // Listar venda
-router.put('/', async (req, res)=> {
+router.get('/', async (req, res)=> {
     try {
         const vendas = await Venda.find();
         res.status(201).json(vendas);
@@ -37,7 +37,7 @@ router.put('/:id', async (req, res)=> {
 });
 
 // Deletar venda
-router.put('/:id', async (req, res)=> {
+router.delete('/:id', async (req, res)=> {
     try {
         await Venda.findByIdAndDelete(req.params.id);
         res.status(201).json({ message: 'Venda removida com sucesso!' });
