@@ -33,8 +33,8 @@ export default function TemporaryDrawer() {
 
   const menuItems = [
     { text: "Dashboard", icon: <TimelineOutlinedIcon /> },
-    { text: "Fornecedores", icon: <StorefrontOutlinedIcon /> },
     { text: "Produtos", icon: <ShoppingCartOutlinedIcon /> },
+    { text: "Fornecedores", icon: <StorefrontOutlinedIcon /> },
     { text: "Compra", icon: <LocalMallOutlinedIcon /> },
     { text: "Venda", icon: <MonetizationOnOutlinedIcon /> },
     { text: "Transferencia", icon: <SwapHorizOutlinedIcon /> },
