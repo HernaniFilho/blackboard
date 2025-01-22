@@ -15,8 +15,8 @@ router.post('/', async (req, res)=> {
     }
 });
 
-// Listar fornecedores
-router.put('/', async (req, res)=> {
+// Listar fornecedores // ola
+router.get('/', async (req, res)=> {
     try {
         const fornecedores = await Fornecedor.find();
         res.status(201).json(fornecedores);
@@ -36,7 +36,7 @@ router.put('/:id', async (req, res)=> {
 });
 
 // Deletar fornecedor
-router.put('/:id', async (req, res)=> {
+router.delete('/:id', async (req, res)=> {
     try {
         await Fornecedor.findByIdAndDelete(req.params.id);
         res.status(201).json({ message: 'Fornecedor removido com sucesso!' });

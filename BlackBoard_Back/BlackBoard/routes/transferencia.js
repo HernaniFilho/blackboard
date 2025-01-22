@@ -15,8 +15,8 @@ router.post('/',  async (req, res)=> {
     }
 });
 
-// Listar transferencia
-router.put('/', async (req, res)=> {
+// Listar transferencia // ola
+router.get('/', async (req, res)=> {
     try {
         const transferencias = await Transferencia.find();
         res.status(201).json(transferencias);
@@ -37,7 +37,7 @@ router.put('/:id', async (req, res)=> {
 });
 
 // Deletar transferencia
-router.put('/:id', async (req, res)=> {
+router.delete('/:id', async (req, res)=> {
     try {
         await Transferencia.findByIdAndDelete(req.params.id);
         res.status(201).json({ message: 'Transferencia removido com sucesso!' });

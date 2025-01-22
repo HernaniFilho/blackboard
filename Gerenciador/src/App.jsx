@@ -20,13 +20,13 @@ function App() {
       case 1:
         return (
           <div>
-            <Fornecedores></Fornecedores>
+            <Produto></Produto>
           </div>
         );
       case 2:
         return (
           <div>
-            <Produto></Produto>
+            <Fornecedores></Fornecedores>
           </div>
         );
       case 3:
