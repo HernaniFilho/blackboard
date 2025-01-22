@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install-all": "concurrently \"cd BlackBoard_Back && npm i\" \"cd Gerenciador && npm i\" \"cd Loja_Varejo_1 && npm i\" \"cd Loja_Varejo_2 && npm i\" ",
-    "GER-BACK":"concurrently \"cd Gerenciador && npm run dev\" \"cd BlackBoard_Back && npm run start\"",
-    "LJ1-BACK":"concurrently \"cd Loja_Varejo_1 && npm run dev\" \"cd BlackBoard_Back && npm run start\"",
-    "start":"concurrently \"cd Gerenciador && npm run dev\" \"cd Loja_Varejo_1 && npm run dev\" \"cd Loja_Varejo_2 && npm run dev\"  \"cd BlackBoard_Back && npm run start\""
-
+    "install-all": "concurrently \"cd BlackBoard_Back/KnowledgeSource && npm i\" \"cd BlackBoard_Back/BlackBoard && npm i\" \"cd Gerenciador && npm i\" \"cd Loja_Varejo_1 && npm i\" \"cd Loja_Varejo_2 && npm i\" ",
+    "GER-BACK": "concurrently \"cd Gerenciador && npm run dev\" \"cd BlackBoard_Back/BlackBoard && npm run start\"",
+    "LJ1-BACK": "concurrently \"cd Loja_Varejo_1 && npm run dev\" \"cd BlackBoard_Back/BlackBoard && npm run start\"",
+    "start": "concurrently \"cd Gerenciador && npm run dev\" \"cd Loja_Varejo_1 && npm run dev\" \"cd Loja_Varejo_2 && npm run dev\"  \"cd BlackBoard_Back/BlackBoard && npm run start\""
   },
   "author": "",
   "license": "ISC",
