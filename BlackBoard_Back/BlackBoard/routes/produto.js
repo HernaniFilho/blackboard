@@ -9,11 +9,15 @@ router.post('/', addProduto, async (req, res)=> {
     try {
         const produto = new Produto(req.body);
         await produto.save();
-        res.status(201).json(produto);
+
+        const produtos = await Produto.find();
+        req.produtos = produtos;
+        return next();
+        //res.status(201).json(produto);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
-});
+}, updateCacheprodutos);
 
 // Listar produtos // ola
 router.get('/', listProduto, async (req, res, next)=> {
@@ -31,11 +35,15 @@ router.get('/', listProduto, async (req, res, next)=> {
 router.put('/:id', updateProduto, async (req, res)=> {
     try {
         const produto = await Produto.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        
+        const produtos = await Produto.find();
+        req.produtos = produtos;
+        return next();
         res.status(201).json(produto);
     } catch (err) {
         res.status(500).json({ error: err.message});
     }
-});
+}, updateCacheprodutos);
 
 // Deletar produto
 router.delete('/:id', deleteProduto, async (req, res)=> {
