@@ -35,6 +35,7 @@ const listProduto = (req, res, next) => {
 };
 
 const updateCacheprodutos = (req, res) => {
+    console.log("Passei pelo updateCacheProdutos");
     produtos = req.produtos;
     console.log(produtos);
     res.status(201).json(produtos);
