@@ -1,11 +1,11 @@
 const express = require('express');
 const Produto = require('../models/produto');
-const authenticate = require('../middleware/authMiddleware');
+const {addProduto, listProduto, updateProduto, deleteProduto} = require('../../KnowledgeSource/middleware/produtoMiddleware');
 
 const router = express.Router();
 
 // Criar produto
-router.post('/', async (req, res)=> {
+router.post('/', addProduto, async (req, res)=> {
     try {
         const produto = new Produto(req.body);
         await produto.save();
@@ -16,9 +16,10 @@ router.post('/', async (req, res)=> {
 });
 
 // Listar produtos // ola
-router.get('/', async (req, res)=> {
+router.get('/', listProduto, async (req, res)=> {
     try {
         const produtos = await Produto.find();
+        res.produtos = produtos;
         res.status(201).json(produtos);
     } catch (err) {
         res.status(500).json({ error: err.message});
@@ -26,7 +27,7 @@ router.get('/', async (req, res)=> {
 });
 
 // Atualizar produto
-router.put('/:id', async (req, res)=> {
+router.put('/:id', updateProduto, async (req, res)=> {
     try {
         const produto = await Produto.findByIdAndUpdate(req.params.id, req.body, { new: true });
         res.status(201).json(produto);
@@ -36,7 +37,7 @@ router.put('/:id', async (req, res)=> {
 });
 
 // Deletar produto
-router.delete('/:id', async (req, res)=> {
+router.delete('/:id', deleteProduto, async (req, res)=> {
     try {
         await Produto.findByIdAndDelete(req.params.id);
         res.status(201).json({ message: 'Produto removido com sucesso!' });

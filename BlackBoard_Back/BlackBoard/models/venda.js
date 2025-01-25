@@ -4,7 +4,8 @@ const vendaSchema = new mongoose.Schema({
     nomeLoja: { type: String, required: true},
     nomeProduto: { type: String, required: true},
     quantidade: { type: Number, required: true},
-    data: { type: Date, required: true}
+    data: { type: Date, required: true},
+    precoTotal: {type: Number, required: true}
 });
 
 module.exports = mongoose.model("venda",vendaSchema);
