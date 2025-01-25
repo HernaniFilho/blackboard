@@ -1,5 +1,21 @@
 var produtos = [];
 var alterado = false;
+/* 
+var altareda = [{nomeLoja: "LojaA", alterado: false}]
+
+lojaExiste = alterada.find(nomeLoja => nomeLoja = req.body.nomeLoja);
+
+if(lojaExiste.alterado == false) {
+    // só pega a cache
+}
+
+if(lojaExiste) {
+    index = alterada.indexOf(lojaExiste);
+    alterada[index] = {nomeLoja: lojaExiste, alterado: true}; // so que false em updadeCacheprodutos
+} else {
+    alterada.push({nomeLoja: req.body.nomeLoja, alterado: true});
+} */
+
 
 
 const addProduto = (req, res, next) => {
@@ -26,20 +42,25 @@ const listProduto = (req, res, next) => {
     console.log("Passei por listProduto");
     const loja = req.body.nomeLoja;
 
-    const produtosEmLoja = produtos.find(produto => produto.nomeLoja === loja); 
-    if(produtosEmLoja === undefined || alterado) {
+    if(alterado || produtos.length == 0) {
+        console.log("Fez requisição no banco de dados");
         return next();
     } else {
+        const produtosEmLoja = produtos.filter(produto => produto.nomeLoja === loja); 
+        console.log("Não fez requisição no banco de dados");
         res.status(200).json(produtosEmLoja);
+        console.log(produtosEmLoja);
     }
 };
 
 const updateCacheprodutos = (req, res) => {
     console.log("Passei pelo updateCacheProdutos");
     produtos = req.produtos;
-    console.log(produtos);
     alterado = false;
-    res.status(201).json(produtos);
+
+    const loja = req.body.nomeLoja;
+    const produtosEmLoja = produtos.filter(produto => produto.nomeLoja === loja); 
+    res.status(201).json(produtosEmLoja);
 };
 
 const updateProduto = (req, res, next) => {
@@ -59,6 +80,9 @@ const updateProduto = (req, res, next) => {
         next();
     } */
     alterado = true;
+    var produto = req.body;
+    index = produtos.indexOf(produto);
+    produtos[index] = produtos;
     next();
 };
 
@@ -75,7 +99,6 @@ const deleteProduto = (req, res, next) => {
     index = produtos.indexOf(produto);
     produtos.splice(index, 1);
     next();
-    console.log(produtos);
 };
 
 module.exports = {addProduto, listProduto, updateProduto, deleteProduto, updateCacheprodutos, produtos};
