@@ -1,6 +1,6 @@
 const express = require('express');
 const Produto = require('../models/produto');
-const {addProduto, listProduto, updateProduto, deleteProduto} = require('../../KnowledgeSource/middleware/produtoMiddleware');
+const {addProduto, listProduto, updateProduto, deleteProduto, updateCacheprodutos} = require('../../KnowledgeSource/middleware/produtoMiddleware');
 
 const router = express.Router();
 
@@ -16,15 +16,16 @@ router.post('/', addProduto, async (req, res)=> {
 });
 
 // Listar produtos // ola
-router.get('/', listProduto, async (req, res)=> {
+router.get('/', listProduto, async (req, res, next)=> {
     try {
         const produtos = await Produto.find();
-        res.produtos = produtos;
-        res.status(201).json(produtos);
+        req.produtos = produtos;
+        return next();
+        //res.status(201).json(produtos); // agora vai ficar no outro middleware updateCacheProdutos
     } catch (err) {
         res.status(500).json({ error: err.message});
     }
-});
+}, updateCacheprodutos);
 
 // Atualizar produto
 router.put('/:id', updateProduto, async (req, res)=> {

@@ -28,12 +28,16 @@ const listProduto = (req, res, next) => {
 
     const produtosEmLoja = produtos.find(produto => produto.nomeLoja === loja); 
     if(produtosEmLoja === undefined || alterado) { // Talvez atualizar produtos aqui dnv
-        next();
-        let teste = res.produtos;
-        console.log(teste);
+        return next();
     } else {
         res.status(200).json(produtosEmLoja);
     }
+};
+
+const updateCacheprodutos = (req, res) => {
+    produtos = req.produtos;
+    console.log(produtos);
+    res.status(201).json(produtos);
 };
 
 const updateProduto = (req, res, next) => {
@@ -64,4 +68,4 @@ const deleteProduto = (req, res, next) => {
     }
 };
 
-module.exports = {addProduto, listProduto, updateProduto, deleteProduto, produtos};
+module.exports = {addProduto, listProduto, updateProduto, deleteProduto, updateCacheprodutos, produtos};
