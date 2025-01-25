@@ -37,26 +37,26 @@ const style = {
   gap: 2,
 };
 const columns = [
-  { id: "nome", label: "Nome", minWidth: 170 },
-  { id: "nomeLoja", label: "Nome Loja", minWidth: 100 },
+  { id: "nome", label: "Nome", minWidth: 150 },
+  { id: "nomeLoja", label: "Nome Loja", minWidth: 70 },
   {
     id: "preco",
     label: "Preço",
-    minWidth: 170,
+    minWidth: 80,
     align: "right",
     format: (value) => value.toLocaleString("pt-BR"),
   },
   {
     id: "quantidade",
     label: "Quantidade",
-    minWidth: 170,
+    minWidth: 80,
     align: "right",
     format: (value) => value.toLocaleString("pt-BR"),
   },
   {
     id: "estoqueMin",
     label: "Estoque Mínimo",
-    minWidth: 170,
+    minWidth: 80,
     align: "right",
     format: (value) => value.toFixed(0),
   },
@@ -127,7 +127,11 @@ function Produto() {
   return (
     <>
       <div>
-        <StickyHeadTable columns={columns} rows={rows}></StickyHeadTable>
+        <StickyHeadTable
+          columns={columns}
+          rows={rows}
+          pageType="orders"
+        ></StickyHeadTable>
       </div>
       <div style={{ padding: "16px" }}>
         <Fab

@@ -71,7 +71,11 @@ function Fornecedores() {
   return (
     <>
       <div>
-        <StickyHeadTable columns={columns} rows={rows}></StickyHeadTable>
+        <StickyHeadTable
+          columns={columns}
+          rows={rows}
+          pageType="inventory"
+        ></StickyHeadTable>
       </div>
       <div style={{ padding: "16px" }}>
         <Fab
