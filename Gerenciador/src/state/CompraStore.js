@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 
+
 const useComprasStore = create((set) => ({
   compras: [],
   loading: false,
