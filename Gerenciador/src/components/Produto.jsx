@@ -15,6 +15,9 @@ import {
   Button,
   Fab,
 } from "@mui/material";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 
 const style = {
   position: "absolute",
@@ -23,40 +26,39 @@ const style = {
   transform: "translate(-50%, -50%)",
   width: "80%",
   maxWidth: "600px",
-  height: "45%",
   bgcolor: theme.palette.custom.skyBlue,
   border: "2px solid #C8D9E6",
   borderRadius: "16px",
   boxShadow: 24,
-  pt: 2,
+  pt: 3,
   px: 4,
   pb: 3,
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  gap: 2,
 };
+
 const columns = [
-  { id: "nome", label: "Nome", minWidth: 170 },
-  { id: "nomeLoja", label: "Nome Loja", minWidth: 100 },
+  { id: "nomeProduto", label: "Nome", minWidth: 150 },
+  { id: "nomeLoja", label: "Nome Loja", minWidth: 70 },
   {
     id: "preco",
     label: "Preço",
-    minWidth: 170,
+    minWidth: 80,
     align: "right",
     format: (value) => value.toLocaleString("pt-BR"),
   },
   {
     id: "quantidade",
     label: "Quantidade",
-    minWidth: 170,
+    minWidth: 80,
     align: "right",
     format: (value) => value.toLocaleString("pt-BR"),
   },
   {
     id: "estoqueMin",
     label: "Estoque Mínimo",
-    minWidth: 170,
+    minWidth: 80,
     align: "right",
     format: (value) => value.toFixed(0),
   },
@@ -65,69 +67,70 @@ const columns = [
 const rows = [
   {
     id: 1,
-    nome: "Product A",
+    nomeProduto: "Product A",
     nomeLoja: "B",
-    preco: 25.99,
-    quantidade: 190,
-    estoqueMin: 70,
-  },
-  {
-    id: 2,
-    nome: "Product B",
-    nomeLoja: "B",
-    preco: 25.99,
-    quantidade: 190,
-    estoqueMin: 70,
-  },
-  {
-    id: 3,
-    nome: "Product C",
-    nomeLoja: "A",
-    preco: 25.99,
-    quantidade: 190,
-    estoqueMin: 70,
-  },
-  {
-    id: 4,
-    nome: "Product C",
-    nomeLoja: "A",
-    preco: 25.99,
-    quantidade: 190,
-    estoqueMin: 70,
-  },
-  {
-    id: 5,
-    nome: "Product C",
-    nomeLoja: "A",
-    preco: 25.99,
-    quantidade: 190,
-    estoqueMin: 70,
-  },
-  {
-    id: 6,
-    nome: "Product C",
-    nomeLoja: "A",
     preco: 25.99,
     quantidade: 190,
     estoqueMin: 70,
   },
 ];
 
+const schema = yup.object().shape({
+  nomeProduto: yup.string().required("O nome do produto é obrigatório"),
+  preco: yup
+    .number()
+    .typeError("O preço deve ser um número")
+    .positive("O preço deve ser positivo")
+    .required("O preço é obrigatório"),
+  loja: yup.string().required("Selecione uma loja"),
+  quantidade: yup
+    .number()
+    .typeError("A quantidade deve ser um número")
+    .positive("A quantidade deve ser maior que zero")
+    .integer("A quantidade deve ser um número inteiro")
+    .required("A quantidade é obrigatória"),
+  estoqueMin: yup
+    .number()
+    .typeError("O estoque mínimo deve ser um número")
+    .positive("O estoque mínimo deve ser positivo")
+    .integer("O estoque mínimo deve ser um número inteiro")
+    .required("O estoque mínimo é obrigatório"),
+});
+
 function Produto() {
-  const [loja, setLoja] = React.useState("");
   const [open, setOpen] = useState(false);
 
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      nomeProduto: "",
+      preco: "",
+      loja: "",
+      quantidade: "",
+      estoqueMin: "",
+    },
+  });
 
-  const handleChange = (event) => {
-    setLoja(event.target.value);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    reset();
+    setOpen(false);
+  };
+
+  const onSubmit = (data) => {
+    console.log("Produto adicionado:", data);
+    handleClose();
   };
 
   return (
     <>
       <div>
-        <StickyHeadTable columns={columns} rows={rows}></StickyHeadTable>
+        <StickyHeadTable columns={columns} rows={rows} pageType="orders" />
       </div>
       <div style={{ padding: "16px" }}>
         <Fab
@@ -138,8 +141,9 @@ function Produto() {
             },
           }}
           aria-label="add"
+          onClick={handleOpen}
         >
-          <AddIcon onClick={handleOpen} />
+          <AddIcon />
         </Fab>
       </div>
       <Modal
@@ -148,81 +152,128 @@ function Produto() {
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
       >
-        <Box sx={{ ...style }}>
-          <h2 id="child-modal-title" style={{ textAlign: "center" }}>
+        <Box sx={style}>
+          <h2
+            id="child-modal-title"
+            style={{ textAlign: "center", marginBottom: "16px" }}
+          >
             Adicionar novo Produto
           </h2>
-          <FormControl fullWidth sx={{ m: 1 }}>
-            <TextField
-              id="outlined-basic"
-              label="Nome do Produto"
-              variant="outlined"
-            />
-          </FormControl>
-          <div style={{ display: "flex", gap: "16px", width: "100%" }}>
-            <FormControl fullWidth sx={{ m: 1 }}>
-              <InputLabel htmlFor="outlined-adornment-amount">Preço</InputLabel>
-              <OutlinedInput
-                id="outlined-adornment-amount"
-                startAdornment={
-                  <InputAdornment position="start">R$</InputAdornment>
-                }
-                label="Preco"
-              />
-            </FormControl>
-            <FormControl fullWidth sx={{ m: 1 }}>
-              <InputLabel id="demo-simple-select-label">Loja</InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={loja}
-                label="Loja"
-                onChange={handleChange}
-              >
-                <MenuItem value={10}>Loja A</MenuItem>
-                <MenuItem value={20}>Loja B</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-
-          <div style={{ display: "flex", gap: "16px", width: "100%" }}>
-            <TextField
-              fullWidth
-              id="product-quantity"
-              label="Quantidade"
-              type="number"
-              variant="outlined"
-            />
-            <TextField
-              fullWidth
-              id="product-min-stock"
-              label="Estoque Mínimo"
-              type="number"
-              variant="outlined"
-            />
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              width: "100%",
-              marginTop: "16px",
-            }}
+          <form
+            style={{ width: "100%" }}
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
           >
-            <Button
-              sx={{ color: theme.palette.custom.navy }}
-              onClick={handleClose}
+            <Controller
+              name="nomeProduto"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Nome do Produto"
+                  variant="outlined"
+                  error={!!errors.nomeProduto}
+                  helperText={errors.nomeProduto?.message}
+                  sx={{ mt: 2 }}
+                />
+              )}
+            />
+
+            <Box sx={{ display: "flex", gap: 3, width: "100%", mt: 2 }}>
+              <Controller
+                name="preco"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel htmlFor="outlined-adornment-amount">
+                      Preço
+                    </InputLabel>
+                    <OutlinedInput
+                      {...field}
+                      startAdornment={
+                        <InputAdornment position="start">R$</InputAdornment>
+                      }
+                      label="Preço"
+                      error={!!errors.preco}
+                    />
+                    <span style={{ color: "red", fontSize: "12px" }}>
+                      {errors.preco?.message}
+                    </span>
+                  </FormControl>
+                )}
+              />
+
+              <Controller
+                name="loja"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel>Loja</InputLabel>
+                    <Select {...field} error={!!errors.loja}>
+                      <MenuItem value="Loja A">Loja A</MenuItem>
+                      <MenuItem value="Loja B">Loja B</MenuItem>
+                    </Select>
+                    <span style={{ color: "red", fontSize: "12px" }}>
+                      {errors.loja?.message}
+                    </span>
+                  </FormControl>
+                )}
+              />
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 3, width: "100%", mt: 2 }}>
+              <Controller
+                name="quantidade"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Quantidade"
+                    type="number"
+                    variant="outlined"
+                    error={!!errors.quantidade}
+                    helperText={errors.quantidade?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="estoqueMin"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Estoque Mínimo"
+                    type="number"
+                    variant="outlined"
+                    error={!!errors.estoqueMin}
+                    helperText={errors.estoqueMin?.message}
+                  />
+                )}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                mt: 3,
+              }}
             >
-              Fechar
-            </Button>
-            <Button
-              sx={{ color: theme.palette.custom.green }}
-              onClick={handleClose}
-            >
-              Adicionar
-            </Button>
-          </div>
+              <Button
+                sx={{ color: theme.palette.custom.navy }}
+                onClick={handleClose}
+              >
+                Fechar
+              </Button>
+              <Button sx={{ color: theme.palette.custom.green }} type="submit">
+                Adicionar
+              </Button>
+            </Box>
+          </form>
         </Box>
       </Modal>
     </>
