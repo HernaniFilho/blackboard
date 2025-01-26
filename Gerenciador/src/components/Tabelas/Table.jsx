@@ -168,7 +168,7 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
         handleClose={handleCloseEdit}
         productData={productData}
         setProductData={setProductData}
-        handleSave={handleSaveEdit}
+        onSubmit={handleSaveEdit}
         pageType={pageType}
       />
     </>

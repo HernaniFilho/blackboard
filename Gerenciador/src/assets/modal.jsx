@@ -1,15 +1,17 @@
-import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import {
   Modal,
   Box,
   TextField,
-  FormControl,
   InputLabel,
   OutlinedInput,
   InputAdornment,
   Select,
   MenuItem,
   Button,
+  FormControl,
 } from "@mui/material";
 import theme from "../assets/palette";
 
@@ -25,119 +27,161 @@ const style = {
   borderRadius: "16px",
   boxShadow: 24,
   p: 4,
-  display: "flex",
-  flexDirection: "column",
-  gap: 2,
 };
+
+// 📌 Schema de validação com Yup
+const schema = yup.object().shape({
+  productName: yup.string().required("Nome do produto é obrigatório"),
+  supplierName: yup.string().required("Nome do fornecedor é obrigatório"),
+  price: yup
+    .number()
+    .typeError("O preço deve ser um número")
+    .positive("O preço deve ser maior que zero")
+    .required("O preço é obrigatório"),
+  quantity: yup
+    .number()
+    .typeError("A quantidade deve ser um número")
+    .min(1, "A quantidade deve ser pelo menos 1")
+    .required("A quantidade é obrigatória"),
+  store: yup.string().required("A loja é obrigatória"),
+});
 
 export default function ProductModal({
   open,
   handleClose,
-  handleSave,
+  onSubmit,
   productData,
   setProductData,
   pageType,
 }) {
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProductData((prevData) => ({ ...prevData, [name]: value }));
-  };
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-    >
+    <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <h2 id="modal-title" style={{ textAlign: "center" }}>
-          {pageType === "inventory"
+        <h2 style={{ textAlign: "center" }}>
+          {pageType !== "inventory"
             ? "Adicionar novo Produto"
-            : "Adicionar novo Item"}
+            : "Adicionar novo Fornecedor"}
         </h2>
 
+        {/* Nome do Fornecedor */}
         {pageType === "inventory" && (
-          <FormControl fullWidth sx={{ m: 1 }}>
-            <TextField
-              label="Nome do Fornecedor"
-              variant="outlined"
-              name="fornecedor"
-              value={productData.nome || ""}
-              onChange={handleChange}
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <Controller
+              name="nomeFornecedor"
+              control={control}
+              defaultValue={productData.nome}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Nome do Fornecedor"
+                  variant="outlined"
+                  error={!!errors.supplierName}
+                  helperText={errors.supplierName?.message}
+                />
+              )}
             />
           </FormControl>
         )}
 
-        <FormControl fullWidth sx={{ m: 1 }}>
-          <TextField
-            label="Nome do Produto"
-            variant="outlined"
-            name="nome"
-            value={productData.nome || ""}
-            onChange={handleChange}
+        {/* Nome do Produto */}
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <Controller
+            name="productName"
+            control={control}
+            defaultValue={productData.nomeProduto}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Nome do Produto"
+                variant="outlined"
+                error={!!errors.productName}
+                helperText={errors.productName?.message}
+              />
+            )}
           />
         </FormControl>
 
-        <div style={{ display: "flex", gap: "16px", width: "100%" }}>
-          <FormControl fullWidth sx={{ m: 1 }}>
-            <InputLabel htmlFor="outlined-adornment-amount">Preço</InputLabel>
-            <OutlinedInput
-              startAdornment={
-                <InputAdornment position="start">R$</InputAdornment>
-              }
-              label="Preco"
-              name="preco"
-              type="number"
-              value={productData.preco || ""}
-              onChange={handleChange}
-            />
-          </FormControl>
-          {pageType === "orders" && (
-            <FormControl fullWidth sx={{ m: 1 }}>
-              <InputLabel id="select-store-label">Loja</InputLabel>
-              <Select
-                labelId="select-store-label"
-                name="loja"
-                value={productData.nomeLoja || ""}
-                onChange={handleChange}
-              >
-                <MenuItem value="A">Loja A</MenuItem>
-                <MenuItem value="B">Loja B</MenuItem>
-              </Select>
-            </FormControl>
-          )}
-        </div>
+        {/* Preço */}
+        <FormControl fullWidth sx={{ mb: 2 }}>
+          <InputLabel htmlFor="price">Preço</InputLabel>
+          <Controller
+            name="price"
+            control={control}
+            defaultValue={productData.preco}
+            render={({ field }) => (
+              <OutlinedInput
+                {...field}
+                id="price"
+                startAdornment={
+                  <InputAdornment position="start">R$</InputAdornment>
+                }
+                label="Preço"
+                error={!!errors.price}
+              />
+            )}
+          />
+          <p style={{ color: "red", fontSize: "12px" }}>
+            {errors.price?.message}
+          </p>
+        </FormControl>
 
-        {pageType !== "inventory" && (
-          <div style={{ display: "flex", gap: "16px", width: "100%" }}>
-            <TextField
-              fullWidth
-              label="Quantidade"
-              type="number"
-              name="quantidade"
-              value={productData.quantidade || ""}
-              onChange={handleChange}
-              variant="outlined"
+        {/* Loja */}
+        {pageType === "orders" && (
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <InputLabel>Loja</InputLabel>
+            <Controller
+              name="store"
+              control={control}
+              defaultValue={productData.nomeLoja}
+              render={({ field }) => (
+                <Select {...field} label="Loja" error={!!errors.store}>
+                  <MenuItem value="A">Loja A</MenuItem>
+                  <MenuItem value="B">Loja B</MenuItem>
+                </Select>
+              )}
             />
-            <TextField
-              fullWidth
-              label="Estoque Mínimo"
-              type="number"
-              name="estoqueMin"
-              value={productData.estoqueMin || ""}
-              onChange={handleChange}
-              variant="outlined"
-            />
-          </div>
+            <p style={{ color: "red", fontSize: "12px" }}>
+              {errors.store?.message}
+            </p>
+          </FormControl>
         )}
 
-        <div
-          style={{
+        {/* Quantidade */}
+        {pageType === "orders" && (
+          <FormControl fullWidth sx={{ mb: 2 }}>
+            <Controller
+              name="quantity"
+              control={control}
+              defaultValue={productData.quantidade}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Quantidade"
+                  type="number"
+                  variant="outlined"
+                  error={!!errors.quantity}
+                  helperText={errors.quantity?.message}
+                />
+              )}
+            />
+          </FormControl>
+        )}
+
+        {/* Botões */}
+        <Box
+          sx={{
             display: "flex",
             justifyContent: "space-between",
             width: "100%",
-            marginTop: "16px",
+            mt: 2,
           }}
         >
           <Button
@@ -148,11 +192,11 @@ export default function ProductModal({
           </Button>
           <Button
             sx={{ color: theme.palette.custom.green }}
-            onClick={handleSave}
+            onClick={handleSubmit(onSubmit)}
           >
             Adicionar
           </Button>
-        </div>
+        </Box>
       </Box>
     </Modal>
   );

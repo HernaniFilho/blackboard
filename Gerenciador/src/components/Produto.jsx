@@ -37,7 +37,7 @@ const style = {
   gap: 2,
 };
 const columns = [
-  { id: "nome", label: "Nome", minWidth: 150 },
+  { id: "nomeProduto", label: "Nome", minWidth: 150 },
   { id: "nomeLoja", label: "Nome Loja", minWidth: 70 },
   {
     id: "preco",
@@ -65,7 +65,7 @@ const columns = [
 const rows = [
   {
     id: 1,
-    nome: "Product A",
+    nomeProduto: "Product A",
     nomeLoja: "B",
     preco: 25.99,
     quantidade: 190,
@@ -73,7 +73,7 @@ const rows = [
   },
   {
     id: 2,
-    nome: "Product B",
+    nomeProduto: "Product B",
     nomeLoja: "B",
     preco: 25.99,
     quantidade: 190,
@@ -81,7 +81,7 @@ const rows = [
   },
   {
     id: 3,
-    nome: "Product C",
+    nomeProduto: "Product C",
     nomeLoja: "A",
     preco: 25.99,
     quantidade: 190,
@@ -89,7 +89,7 @@ const rows = [
   },
   {
     id: 4,
-    nome: "Product C",
+    nomeProduto: "Product C",
     nomeLoja: "A",
     preco: 25.99,
     quantidade: 190,
@@ -97,7 +97,7 @@ const rows = [
   },
   {
     id: 5,
-    nome: "Product C",
+    nomeProduto: "Product C",
     nomeLoja: "A",
     preco: 25.99,
     quantidade: 190,
@@ -105,7 +105,7 @@ const rows = [
   },
   {
     id: 6,
-    nome: "Product C",
+    nomeProduto: "Product C",
     nomeLoja: "A",
     preco: 25.99,
     quantidade: 190,

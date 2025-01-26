@@ -18,7 +18,7 @@ import {
 
 const columns = [
   { id: "nome", label: "Nome do Fornecedor", minWidth: 220 },
-  { id: "produto", label: "Produto", minWidth: 220 },
+  { id: "nomeProduto", label: "Produto", minWidth: 220 },
   {
     id: "preco",
     label: "Preço do Produto",
@@ -32,7 +32,7 @@ const rows = [
   {
     id: 1,
     nome: "SapatosDemais",
-    produto: "Sapatilha",
+    nomeProduto: "Sapatilha",
     preco: 119.95,
   },
 ];
