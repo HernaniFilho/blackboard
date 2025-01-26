@@ -1,54 +1,17 @@
 const express = require('express');
 const Produto = require('../models/produto');
-const {addProduto, listProduto, updateProduto, deleteProduto, updateCacheprodutos} = require('../../KnowledgeSource/middleware/produtoMiddleware');
+
+const ProdutoProxyService = require("../../KnowledgeSource/middleware/produtoMiddleware/produtoProxyService");
+
+const produtoProxyMiddleware = new ProdutoProxyService(Produto);
 
 const router = express.Router();
 
-// Criar produto
-router.post('/', addProduto, async (req, res, next)=> {
-    try {
-        const produto = new Produto(req.body);
-        await produto.save();
+router.get('/', (req, res, next) => produtoProxyMiddleware.listProduto(req, res, next), (req, res) => produtoProxyMiddleware.updateCacheprodutos(req, res));
 
-        const produtos = await Produto.find();
-        req.produtos = produtos;
-        return next();
-        //res.status(201).json(produto);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-}, updateCacheprodutos);
+router.post('/', (req, res, next) => produtoProxyMiddleware.addProduto(req, res, next), (req, res) => produtoProxyMiddleware.updateCacheprodutos(req, res));
 
-// Listar produtos // ola
-router.get('/', listProduto, async (req, res, next)=> {
-    try {
-        const produtos = await Produto.find();
-        req.produtos = produtos;
-        return next();
-        //res.status(201).json(produtos); // agora vai ficar no outro middleware updateCacheProdutos
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-}, updateCacheprodutos);
+router.put('/:id', (req, res, next) => produtoProxyMiddleware.updateProduto(req, res, next), (req, res) => produtoProxyMiddleware.updateProdutoCache(req, res));
 
-// Atualizar produto
-router.put('/:id', updateProduto, async (req, res)=> {
-    try {
-        const produto = await Produto.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.status(201).json(produto);
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-}, updateCacheprodutos);
-
-// Deletar produto
-router.delete('/:id', deleteProduto, async (req, res)=> {
-    try {
-        await Produto.findByIdAndDelete(req.params.id);
-        res.status(201).json({ message: 'Produto removido com sucesso!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-});
-
+router.delete('/:id', (req, res, next) => produtoProxyMiddleware.deleteProduto(req, res, next), (req, res) => produtoProxyMiddleware.updateDelete(req, res));
 module.exports = router;
