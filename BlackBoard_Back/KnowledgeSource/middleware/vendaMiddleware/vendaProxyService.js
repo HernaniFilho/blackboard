@@ -1,76 +1,76 @@
-const iFornecedorService = require('./iVendaService');
-const FornecedorMiddleware = require('./vendaMiddleware');
+const iVendaService = require('./iVendaService');
+const VendaMiddleware = require('./vendaMiddleware');
 
-class FornecedorProxyService extends iFornecedorService {
+class VendaProxyService extends iVendaService {
 
-    constructor(FornecedorModel) {
+    constructor(VendaModel) {
         super();
-        this.FornecedorMiddleware = new FornecedorMiddleware(FornecedorModel);
-        this.fornecedores = [];
+        this.VendaMiddleware = new VendaMiddleware(VendaModel);
+        this.vendas = [];
         this.alterado = false;
-        this.addFornecedor = this.addFornecedor.bind(this);
-        this.listFornecedor = this.listFornecedor.bind(this);
-        this.updateCacheFornecedors = this.updateCacheFornecedors.bind(this);
-        this.updateFornecedor = this.updateFornecedor.bind(this);
-        this.deleteFornecedor = this.deleteFornecedor.bind(this);
-        this.updateFornecedorCache =this.updateFornecedorCache.bind(this);
+        this.addVenda = this.addVenda.bind(this);
+        this.listVenda = this.listVenda.bind(this);
+        this.updateCacheVendas = this.updateCacheVendas.bind(this);
+        this.updateVenda = this.updateVenda.bind(this);
+        this.deleteVenda = this.deleteVenda.bind(this);
+        this.updateVendaCache =this.updateVendaCache.bind(this);
     }
 
-    async addFornecedor(req, res, next) {
+    async addVenda(req, res, next) {
         this.alterado = true;
-        await this.FornecedorMiddleware.addFornecedor(req, res, next);
+        await this.VendaMiddleware.addVenda(req, res, next);
     }
-    async listFornecedor(req, res, next) {
-        const loja = req.body.nomeLoja;
+    async listVenda(req, res, next) {
+        //const loja = req.headers.nomeloja;
 
-        if (this.alterado || this.fornecedores.length === 0) {
-            await this.FornecedorMiddleware.listFornecedor(req, res, next);
+        if (this.alterado || this.vendas.length === 0) {
+            await this.VendaMiddleware.listVenda(req, res, next);
         } else {
             console.log("PEGO DO PROXY");
-            //const FornecedorsEmLoja = this.fornecedores.filter(Fornecedor => Fornecedor.nomeLoja === loja);
-            res.status(200).json(this.fornecedores);//FornecedorsEmLoja
+            //const VendasEmLoja = this.vendas.filter(vendas => vendas.nomeLoja === loja);
+            res.status(200).json(this.vendas);//VendasEmLoja
         }
     }
 
-    async updateCacheFornecedors(req, res, next) {
-        this.fornecedores = req.Fornecedors;
+    async updateCacheVendas(req, res, next) {
+        this.vendas = req.vendas;
         this.alterado = false;
-        res.status(201).json(this.fornecedores);
+        res.status(201).json(this.vendas);
     }
-    async updateFornecedor(req, res, next) {
+    async updateVenda(req, res, next) {
         this.alterado = true;
-        await this.FornecedorMiddleware.updateFornecedor(req, res, next);
+        await this.VendaMiddleware.updateVenda(req, res, next);
     }
-    async updateFornecedorCache(req, res, next) {
+    async updateVendaCache(req, res, next) {
         this.alterado = false;
-        const fornecedor = req.fornecedors;
+        const Venda = req.vendas;
 
-        const index = this.fornecedores.findIndex(f => String(f._id) === String(fornecedor._id));
+        const index = this.vendas.findIndex(v => String(v._id) === String(Venda._id));
 
-        this.fornecedores[index] = fornecedor;
-        res.status(201).json(fornecedor);
+        this.vendas[index] = Venda;
+        res.status(201).json(Venda);
     }
 
     
-    async deleteFornecedor(req, res, next) {
+    async deleteVenda(req, res, next) {
         this.alterado = true;
-        await this.FornecedorMiddleware.deleteFornecedor(req, res, next);
+        await this.VendaMiddleware.deleteVenda(req, res, next);
     }
 
     async updateDelete(req, res, next) {
         this.alterado = false;
-        const fornecedor = req.body;
+        const Venda = req.body;
 
-        const index = this.fornecedores.findIndex(f => f.nome === fornecedor.nome && f._id === req.params.id);
-        this.fornecedores.splice(index, 1);
-        res.status(201).json({ message: 'Fornecedor removido com sucesso!' });
+        const index = this.vendas.findIndex(v => v._id === req.params.id);
+        this.vendas.splice(index, 1);
+        res.status(201).json({ message: 'Venda removido com sucesso!' });
     }
-    async addFornecedorCache(req, res, next) {
-        const fornecedorAtualizado = req.fornecedors;
-        const index = this.fornecedores.push(fornecedorAtualizado);
+    async addVendaCache(req, res, next) {
+        const VendaAtualizado = req.vendas;
+        const index = this.vendas.push(VendaAtualizado);
 
-        this.fornecedores[index] = fornecedorAtualizado;
+        this.vendas[index] = VendaAtualizado;
         res.status(201).json(req.body);
     }
 }
-module.exports = FornecedorProxyService;
+module.exports = VendaProxyService;

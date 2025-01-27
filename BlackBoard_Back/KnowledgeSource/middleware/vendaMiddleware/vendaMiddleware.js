@@ -1,49 +1,49 @@
-const iFornecedorService = require('./iVendaService');
+const iVendaService = require('./iVendaService');
 
-class FornecedorMiddleware extends iFornecedorService {
-    constructor(FornecedorModel) {
+class VendaMiddleware extends iVendaService {
+    constructor(VendaModel) {
         super();
-        this.Fornecedor = FornecedorModel;
-        this.addFornecedor = this.addFornecedor.bind(this);
-        this.listFornecedor = this.listFornecedor.bind(this);
-        this.updateFornecedor = this.updateFornecedor.bind(this);
-        this.deleteFornecedor = this.deleteFornecedor.bind(this);
+        this.Venda = VendaModel;
+        this.addVenda = this.addVenda.bind(this);
+        this.listVenda = this.listVenda.bind(this);
+        this.updateVenda = this.updateVenda.bind(this);
+        this.deleteVenda = this.deleteVenda.bind(this);
     }
 
-    async addFornecedor(req, res, next) {
+    async addVenda(req, res, next) {
         try {
-            const Fornecedor = new this.Fornecedor(req.body);
-            await Fornecedor.save();
+            const Venda = new this.Venda(req.body);
+            await Venda.save();
 
-            req.fornecedors = Fornecedor
+            req.vendas = Venda
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async listFornecedor(req, res, next) {
+    async listVenda(req, res, next) {
         try {
-            const Fornecedors = await this.Fornecedor.find();
-            req.Fornecedors = Fornecedors;
+            const Vendas = await this.Venda.find();
+            req.vendas = Vendas;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async updateFornecedor(req, res, next) {
+    async updateVenda(req, res, next) {
         try {
-            const fornecedorALT = await this.Fornecedor.findByIdAndUpdate(req.params.id, req.body, { new: true });
-            req.fornecedors = fornecedorALT;
+            const VendaALT = await this.Venda.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            req.vendas = VendaALT;
 
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async deleteFornecedor(req, res, next) {
+    async deleteVenda(req, res, next) {
         try {
-            await this.Fornecedor.findByIdAndDelete(req.params.id);
-            //res.Fornecedors = req.params.id;
+            await this.Venda.findByIdAndDelete(req.params.id);
+            //res.vendas = req.params.id;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -51,4 +51,4 @@ class FornecedorMiddleware extends iFornecedorService {
 
     }
 }
-module.exports = FornecedorMiddleware;
+module.exports = VendaMiddleware;
