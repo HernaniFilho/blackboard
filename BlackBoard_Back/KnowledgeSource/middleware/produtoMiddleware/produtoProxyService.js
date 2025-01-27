@@ -41,19 +41,26 @@ class produtoProxyService extends iProdutoService {
 
     async updateProduto(req, res, next) {
         this.alterado = true;
-        await this.produtoMiddleware.updateProduto(req, res, next);
+        const nomeAlteracao = req.body.nomeProduto;
+
+        if(this.produtos.length !== 0){
+            if((this.produtos.filter(produto=>produto.nomeProduto === nomeAlteracao)).length === 0 ){
+                res.status(401).json({nomeProduto:'Não é permitido a alteração do nome do produto.'})
+            }else{
+                await this.produtoMiddleware.updateProduto(req, res, next);   
+            }
+        }else{
+            res.status(401).json({semCache:'Não há produto para alterar na cache.'})
+        }
     }
 
     async updateProdutoCache(req, res, next) {
         const produtoAtualizado = req.body;
-        const index = this.produtos.findIndex(
-            p => p.nome === produtoAtualizado.nome && p.nomeLoja === produtoAtualizado.nomeLoja
-        );
-        if (index >= 0) {
+            const index = this.produtos.findIndex(
+                p => p.nomeProduto === produtoAtualizado.nomeProduto && p.nomeLoja === produtoAtualizado.nomeLoja
+            );
             this.produtos[index] = produtoAtualizado;
             res.status(201).json(req.body);
-        }
-
     }
     async deleteProduto(req, res, next) {
         this.alterado = true;
@@ -64,7 +71,7 @@ class produtoProxyService extends iProdutoService {
         this.alterado = true;
 
         const produto = req.body;
-        const index = this.produtos.findIndex(p => p.nome === produto.nome && p.nomeLoja === produto.nomeLoja);
+        const index = this.produtos.findIndex(p => p.nomeProduto === produto.nomeProduto && p.nomeLoja === produto.nomeLoja);
 
         if (index >= 0) {
             this.produtos.splice(index, 1);
