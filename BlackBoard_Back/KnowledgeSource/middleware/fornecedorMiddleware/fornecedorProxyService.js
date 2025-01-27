@@ -61,7 +61,7 @@ class FornecedorProxyService extends iFornecedorService {
         this.alterado = false;
         const fornecedor = req.body;
 
-        const index = this.fornecedores.findIndex(f => f.nome === fornecedor.nome && f._id === req.params.id);
+        const index = this.fornecedores.findIndex(f => f.nomeFornecedor === fornecedor.nomeFornecedor && f._id === req.params.id);
         this.fornecedores.splice(index, 1);
         res.status(201).json({ message: 'Fornecedor removido com sucesso!' });
     }
