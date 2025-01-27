@@ -65,9 +65,9 @@ export default function ConfirmarVenda({ open, handleClose }) {
         <Typography gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
           Quantidade: {quantidade}
         </Typography>
-        <Typography gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
+        {precoTotal != null && (<Typography gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
           Total: {precoTotal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
-        </Typography>
+        </Typography>)}
         <Typography gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}></Typography>
         <Typography gutterBottom sx={{ mt: 4, fontWeight: 'bold' }}>
           Deseja confirmar esta venda?
