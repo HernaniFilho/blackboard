@@ -16,11 +16,10 @@ dotenv.config();
 
 const app = express(); // Create an Express app
 
-
+app.use(cors());
 // Middleware to parse JSON requests
 app.use(express.json());
 // Middlewarte CORS
-//app.use(cors);
 
 // Connect to moongose
 mongoose
