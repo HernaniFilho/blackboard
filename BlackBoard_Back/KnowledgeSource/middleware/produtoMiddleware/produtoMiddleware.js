@@ -16,8 +16,7 @@ class ProdutoMiddleware extends iProdutoService {
             const produto = new this.Produto(req.body);
             await produto.save();
 
-            const produtos = await this.Produto.find();
-            req.produtos = produtos;
+            req.produtos = produto;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });

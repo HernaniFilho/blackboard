@@ -1,72 +1,76 @@
-const iProdutoService = require('./iFornecedorService');
-const ProdutoMiddleware = require('./produtoMiddleware');
+const iFornecedorService = require('./iFornecedorService');
+const FornecedorMiddleware = require('./fornecedorMiddleware');
 
-class produtoProxyService extends iProdutoService {
+class FornecedorProxyService extends iFornecedorService {
 
-    constructor(produtoModel) {
+    constructor(FornecedorModel) {
         super();
-        this.produtoMiddleware = new ProdutoMiddleware(produtoModel);
-        this.produtos = [];
+        this.FornecedorMiddleware = new FornecedorMiddleware(FornecedorModel);
+        this.fornecedores = [];
         this.alterado = false;
-        this.addProduto = this.addProduto.bind(this);
-        this.listProduto = this.listProduto.bind(this);
-        this.updateCacheprodutos = this.updateCacheprodutos.bind(this);
-        this.updateProduto = this.updateProduto.bind(this);
-        this.deleteProduto = this.deleteProduto.bind(this);
+        this.addFornecedor = this.addFornecedor.bind(this);
+        this.listFornecedor = this.listFornecedor.bind(this);
+        this.updateCacheFornecedors = this.updateCacheFornecedors.bind(this);
+        this.updateFornecedor = this.updateFornecedor.bind(this);
+        this.deleteFornecedor = this.deleteFornecedor.bind(this);
+        this.updateFornecedorCache =this.updateFornecedorCache.bind(this);
     }
 
-    async addProduto(req, res, next) {
+    async addFornecedor(req, res, next) {
         this.alterado = true;
-        await this.produtoMiddleware.addProduto(req, res, next);
+        await this.FornecedorMiddleware.addFornecedor(req, res, next);
     }
-    async listProduto(req, res, next) {
-        const loja = req.body.nomeLoja;
+    async listFornecedor(req, res, next) {
+        //const loja = req.headers.nomeloja;//atualmente nao se utiliza essa linha para nada, porem deixei alterada assim caso mude a ideia de mostrar todos os fornecedores
 
-        if (this.alterado || this.produtos.length === 0) {
-            await this.produtoMiddleware.listProduto(req, res, next);
+        if (this.alterado || this.fornecedores.length === 0) {
+            await this.FornecedorMiddleware.listFornecedor(req, res, next);
         } else {
-            const produtosEmLoja = this.produtos.filter(produto => produto.nomeLoja === loja);
-            res.status(200).json(produtosEmLoja);
+            console.log("PEGO DO PROXY");
+            //const FornecedorsEmLoja = this.fornecedores.filter(Fornecedor => Fornecedor.nomeLoja === loja);
+            res.status(200).json(this.fornecedores);//FornecedorsEmLoja
         }
     }
 
-    async updateCacheprodutos(req, res, next) {
-        this.produtos = req.produtos;
+    async updateCacheFornecedors(req, res, next) {
+        this.fornecedores = req.Fornecedors;
         this.alterado = false;
-        const loja = req.body.nomeLoja;
-        const produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
-        res.status(201).json(produtosEmLoja);
+        res.status(201).json(this.fornecedores);
     }
-    async updateProduto(req, res, next) {
+    async updateFornecedor(req, res, next) {
         this.alterado = true;
-        await this.produtoMiddleware.updateProduto(req, res, next);
+        await this.FornecedorMiddleware.updateFornecedor(req, res, next);
     }
-    async updateProdutoCache(req, res, next) {
-        const produtoAtualizado = req.body;
-        const index = this.produtos.findIndex(
-            p => p.nome === produtoAtualizado.nome && p.nomeLoja === produtoAtualizado.nomeLoja
-        );
-        if (index >= 0) {
-            this.produtos[index] = produtoAtualizado;
-            res.status(201).json(req.body);
-        }
+    async updateFornecedorCache(req, res, next) {
+        this.alterado = false;
+        const fornecedor = req.fornecedors;
 
+        const index = this.fornecedores.findIndex(f => String(f._id) === String(fornecedor._id));
+
+        this.fornecedores[index] = fornecedor;
+        res.status(201).json(fornecedor);
     }
-    async deleteProduto(req, res, next) {
+
+    
+    async deleteFornecedor(req, res, next) {
         this.alterado = true;
-        await this.produtoMiddleware.deleteProduto(req, res, next);
+        await this.FornecedorMiddleware.deleteFornecedor(req, res, next);
     }
 
     async updateDelete(req, res, next) {
-        this.alterado = true;
+        this.alterado = false;
+        const fornecedor = req.body;
 
-        const produto = req.body;
-        const index = this.produtos.findIndex(p => p.nome === produto.nome && p.nomeLoja === produto.nomeLoja);
+        const index = this.fornecedores.findIndex(f => f.nome === fornecedor.nome && f._id === req.params.id);
+        this.fornecedores.splice(index, 1);
+        res.status(201).json({ message: 'Fornecedor removido com sucesso!' });
+    }
+    async addFornecedorCache(req, res, next) {
+        const fornecedorAtualizado = req.fornecedors;
+        const index = this.fornecedores.push(fornecedorAtualizado);
 
-        if (index >= 0) {
-            this.produtos.splice(index, 1);
-        }
-        res.status(201).json({ message: 'Produto removido com sucesso!' });
+        this.fornecedores[index] = fornecedorAtualizado;
+        res.status(201).json(req.body);
     }
 }
-module.exports = produtoProxyService;
+module.exports = FornecedorProxyService;

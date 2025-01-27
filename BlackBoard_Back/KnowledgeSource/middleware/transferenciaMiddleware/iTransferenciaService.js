@@ -1,13 +1,13 @@
 const requiredMethods = [
-    "addTransferencia",
-    "listTransferencia",
-    "updateCacheTransferencia",
-    "deleteTransferencia"
+    "addFornecedor",
+    "listFornecedor",
+    "updateFornecedor",
+    "deleteFornecedor"
 ];
 
-class iTransferenciaService {
+class iFornecedorService {
     constructor() {
-        if (this.constructor === iTransferenciaService) {
+        if (this.constructor === iFornecedorService) {
             throw new Error("Instanciamento direto não permitido");
         }
         for (const method of requiredMethods) {
@@ -17,4 +17,4 @@ class iTransferenciaService {
         }
     };
 }
-module.exports = iTransferenciaService;
+module.exports = iFornecedorService;

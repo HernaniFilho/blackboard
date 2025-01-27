@@ -20,11 +20,12 @@ class produtoProxyService extends iProdutoService {
         await this.produtoMiddleware.addProduto(req, res, next);
     }
     async listProduto(req, res, next) {
-        const loja = req.body.nomeLoja;
+        const loja = req.headers.nomeloja;
 
         if (this.alterado || this.produtos.length === 0) {
             await this.produtoMiddleware.listProduto(req, res, next);
         } else {
+            console.log("Peguei do Proxy")
             const produtosEmLoja = this.produtos.filter(produto => produto.nomeLoja === loja);
             res.status(200).json(produtosEmLoja);
         }
@@ -33,14 +34,16 @@ class produtoProxyService extends iProdutoService {
     async updateCacheprodutos(req, res, next) {
         this.produtos = req.produtos;
         this.alterado = false;
-        const loja = req.body.nomeLoja;
+        const loja = req.headers.nomeloja;//const loja = req.headers.nomeLoja;
         const produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
         res.status(201).json(produtosEmLoja);
     }
+
     async updateProduto(req, res, next) {
         this.alterado = true;
         await this.produtoMiddleware.updateProduto(req, res, next);
     }
+
     async updateProdutoCache(req, res, next) {
         const produtoAtualizado = req.body;
         const index = this.produtos.findIndex(
@@ -68,5 +71,14 @@ class produtoProxyService extends iProdutoService {
         }
         res.status(201).json({ message: 'Produto removido com sucesso!' });
     }
+
+    async addProdutoCache(req, res, next) {
+        const novoProduto = req.produtos;
+        const index = this.produtos.push(novoProduto);
+
+        this.produtos[index] = novoProduto;
+        res.status(201).json(novoProduto);
+    }
+
 }
 module.exports = produtoProxyService;

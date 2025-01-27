@@ -1,8 +1,7 @@
 const requiredMethods = [
     "addFornecedor",
     "listFornecedor",
-    "updateCacheFornecedor",
-    "updateForecedor",
+    "updateFornecedor",
     "deleteFornecedor"
 ];
 

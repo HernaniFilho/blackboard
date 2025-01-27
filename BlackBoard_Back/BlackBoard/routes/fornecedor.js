@@ -1,48 +1,18 @@
 const express = require('express');
 const Fornecedor = require('../models/fornecedor');
-const authenticate = require('../middleware/authMiddleware');
+const FornecedorProxyService = require('../../KnowledgeSource/middleware/fornecedorMiddleware/fornecedorProxyService')
+
+const fornecedorMiddleware = new FornecedorProxyService(Fornecedor)
 
 const router = express.Router();
 
 // Criar fornecedor
-router.post('/', async (req, res)=> {
-    try {
-        const fornecedor = new Fornecedor(req.body);
-        await fornecedor.save();
-        res.status(201).json(fornecedor);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
+router.post('/',(req,res,next)=>fornecedorMiddleware.addFornecedor(req,res,next),(req,res)=>fornecedorMiddleware.addFornecedorCache(req,res) );
 // Listar fornecedores // ola
-router.get('/', async (req, res)=> {
-    try {
-        const fornecedores = await Fornecedor.find();
-        res.status(201).json(fornecedores);
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-});
-
+router.get('/',(req,res,next)=>fornecedorMiddleware.listFornecedor(req,res,next),(req,res)=>fornecedorMiddleware.updateCacheFornecedors(req,res));
 // Atualizar fornecedor
-router.put('/:id', async (req, res)=> {
-    try {
-        const fornecedor = await Fornecedor.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.status(201).json(fornecedor);
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-});
-
+router.put('/:id',(req,res,next)=>fornecedorMiddleware.updateFornecedor(req,res,next) ,(req,res)=>fornecedorMiddleware.updateFornecedorCache(req,res));
 // Deletar fornecedor
-router.delete('/:id', async (req, res)=> {
-    try {
-        await Fornecedor.findByIdAndDelete(req.params.id);
-        res.status(201).json({ message: 'Fornecedor removido com sucesso!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-});
+router.delete('/:id',(req,res,next)=>fornecedorMiddleware.deleteFornecedor(req,res,next),(req,res)=>fornecedorMiddleware.updateDelete(req,res) );
 
 module.exports = router;

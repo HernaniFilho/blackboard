@@ -1,58 +1,49 @@
-const iProdutoService = require('./iTransferenciaService');
+const iFornecedorService = require('./iTransferenciaService');
 
-class ProdutoMiddleware extends iProdutoService {
-    constructor(produtoModel) {
+class FornecedorMiddleware extends iFornecedorService {
+    constructor(FornecedorModel) {
         super();
-        this.Produto = produtoModel;
-        this.addProduto = this.addProduto.bind(this);
-        this.listProduto = this.listProduto.bind(this);
-        this.updateCacheprodutos = this.updateCacheprodutos.bind(this);
-        this.updateProduto = this.updateProduto.bind(this);
-        this.deleteProduto = this.deleteProduto.bind(this);
+        this.Fornecedor = FornecedorModel;
+        this.addFornecedor = this.addFornecedor.bind(this);
+        this.listFornecedor = this.listFornecedor.bind(this);
+        this.updateFornecedor = this.updateFornecedor.bind(this);
+        this.deleteFornecedor = this.deleteFornecedor.bind(this);
     }
 
-    async addProduto(req, res, next) {
+    async addFornecedor(req, res, next) {
         try {
-            const produto = new this.Produto(req.body);
-            await produto.save();
+            const Fornecedor = new this.Fornecedor(req.body);
+            await Fornecedor.save();
 
-            const produtos = await this.Produto.find();
-            req.produtos = produtos;
+            req.fornecedors = Fornecedor
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async listProduto(req, res, next) {
+    async listFornecedor(req, res, next) {
         try {
-            const produtos = await this.Produto.find();
-            req.produtos = produtos;
+            const Fornecedors = await this.Fornecedor.find();
+            req.Fornecedors = Fornecedors;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async updateCacheprodutos(req, res, next) {
-        this.produtos = req.produtos;
-        this.alterado = false;
-
-        const loja = req.body.nomeLoja;
-        const produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
-        res.status(201).json(produtosEmLoja);
-    }
-    async updateProduto(req, res, next) {
-
+    async updateFornecedor(req, res, next) {
         try {
-            await this.Produto.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            const fornecedorALT = await this.Fornecedor.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            req.fornecedors = fornecedorALT;
+
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async deleteProduto(req, res, next) {
+    async deleteFornecedor(req, res, next) {
         try {
-            await this.Produto.findByIdAndDelete(req.params.id);
-            res.produtos = req.params.id;
+            await this.Fornecedor.findByIdAndDelete(req.params.id);
+            //res.Fornecedors = req.params.id;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
@@ -60,4 +51,4 @@ class ProdutoMiddleware extends iProdutoService {
 
     }
 }
-module.exports = ProdutoMiddleware;
+module.exports = FornecedorMiddleware;

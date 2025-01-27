@@ -9,7 +9,7 @@ const router = express.Router();
 
 router.get('/', (req, res, next) => produtoProxyMiddleware.listProduto(req, res, next), (req, res) => produtoProxyMiddleware.updateCacheprodutos(req, res));
 
-router.post('/', (req, res, next) => produtoProxyMiddleware.addProduto(req, res, next), (req, res) => produtoProxyMiddleware.updateCacheprodutos(req, res));
+router.post('/', (req, res, next) => produtoProxyMiddleware.addProduto(req, res, next), (req, res) => produtoProxyMiddleware.addProdutoCache(req, res));
 
 router.put('/:id', (req, res, next) => produtoProxyMiddleware.updateProduto(req, res, next), (req, res) => produtoProxyMiddleware.updateProdutoCache(req, res));
 

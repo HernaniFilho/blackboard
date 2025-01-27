@@ -1,63 +1,67 @@
 const iCompraService = require('./iCompraService');
 
 class CompraMiddleware extends iCompraService {
-    constructor(produtoModel) {
+    constructor(compraModel) {
         super();
-        this.Produto = produtoModel;
-        this.addProduto = this.addProduto.bind(this);
-        this.listProduto = this.listProduto.bind(this);
-        this.updateCacheprodutos = this.updateCacheprodutos.bind(this);
-        this.updateProduto = this.updateProduto.bind(this);
-        this.deleteProduto = this.deleteProduto.bind(this);
+        this.Compra = compraModel;
+        this.criaCompra = this.criaCompra.bind(this);
+        this.listCompra = this.listCompra.bind(this);
+        this.updateCacheCompra = this.updateCacheCompra.bind(this);
+        //this.updateCompra = this.updateCompra.bind(this);
+        this.deleteCompra = this.deleteCompra.bind(this);
     }
 
-    async addProduto(req, res, next) {
+    async criaCompra(req, res, next) {
         try {
-            const produto = new this.Produto(req.body);
-            await produto.save();
+            const compra = new this.Compra(req.body);
+            await compra.save();
 
-            const produtos = await this.Produto.find();
-            req.produtos = produtos;
+            req.compras = compra;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async listProduto(req, res, next) {
+    async listCompra(req, res, next) {
+
         try {
-            const produtos = await this.Produto.find();
-            req.produtos = produtos;
+            const compras = await this.Compra.find();
+            //res.status(201).json(compras);
+            req.compras = compras;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async updateCacheprodutos(req, res, next) {
-        this.produtos = req.produtos;
+    async updateCacheCompra(req, res, next) {
+        this.compras = req.compras;
         this.alterado = false;
 
         const loja = req.body.nomeLoja;
-        const produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
-        res.status(201).json(produtosEmLoja);
+        const comprasEmLoja = this.compras.filter(compras => compras.nomeLoja === loja);
+        res.status(201).json(comprasEmLoja);
     }
-    async updateProduto(req, res, next) {
+    /*
+    não implementaddo
+    async updateCompra(req, res, next) {
 
         try {
-            await this.Produto.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            await this.compra.findByIdAndUpdate(req.params.id, req.body, { new: true });
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async deleteProduto(req, res, next) {
+        */
+    async deleteCompra(req, res, next) {
         try {
-            await this.Produto.findByIdAndDelete(req.params.id);
-            res.produtos = req.params.id;
+            await this.Compra.findByIdAndDelete(req.params.id);
+            res.compras = req.params.id;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
-
     }
+
 }
 module.exports = CompraMiddleware;
