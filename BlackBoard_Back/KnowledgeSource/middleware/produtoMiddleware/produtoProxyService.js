@@ -20,8 +20,7 @@ class produtoProxyService extends iProdutoService {
         await this.produtoMiddleware.addProduto(req, res, next);
     }
     async listProduto(req, res, next) {
-        const loja = req.body.nomeLoja;
-
+        const loja = req.headers.nomeloja;
         if (this.alterado || this.produtos.length === 0) {
             await this.produtoMiddleware.listProduto(req, res, next);
         } else {
@@ -33,7 +32,7 @@ class produtoProxyService extends iProdutoService {
     async updateCacheprodutos(req, res, next) {
         this.produtos = req.produtos;
         this.alterado = false;
-        const loja = req.body.nomeLoja;
+        const loja = req.body.nomeLoja;  //const loja = req.headers.nomeLoja;
         const produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
         res.status(201).json(produtosEmLoja);
     }
