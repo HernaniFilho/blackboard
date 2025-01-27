@@ -1,48 +1,48 @@
-const iFornecedorService = require('./iTransferenciaService');
+const iTransferenciaService = require('./iTransferenciaService');
 
-class FornecedorMiddleware extends iFornecedorService {
-    constructor(FornecedorModel) {
+class TransferenciaMiddleware extends iTransferenciaService {
+    constructor(TransferenciaModel) {
         super();
-        this.Fornecedor = FornecedorModel;
-        this.addFornecedor = this.addFornecedor.bind(this);
-        this.listFornecedor = this.listFornecedor.bind(this);
-        this.updateFornecedor = this.updateFornecedor.bind(this);
-        this.deleteFornecedor = this.deleteFornecedor.bind(this);
+        this.Transferencia = TransferenciaModel;
+        this.addTransferencia = this.addTransferencia.bind(this);
+        this.listTransferencia = this.listTransferencia.bind(this);
+        this.updateTransferencia = this.updateTransferencia.bind(this);
+        this.deleteTransferencia = this.deleteTransferencia.bind(this);
     }
 
-    async addFornecedor(req, res, next) {
+    async addTransferencia(req, res, next) {
         try {
-            const Fornecedor = new this.Fornecedor(req.body);
-            await Fornecedor.save();
+            const Transferencia = new this.Transferencia(req.body);
+            await Transferencia.save();
 
-            req.fornecedors = Fornecedor
+            req.transferencias = Transferencia;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async listFornecedor(req, res, next) {
+    async listTransferencia(req, res, next) {
         try {
-            const Fornecedors = await this.Fornecedor.find();
-            req.Fornecedors = Fornecedors;
+            const Transferencias = await this.Transferencia.find();
+            req.transferencias = Transferencias;
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async updateFornecedor(req, res, next) {
+    async updateTransferencia(req, res, next) {
         try {
-            const fornecedorALT = await this.Fornecedor.findByIdAndUpdate(req.params.id, req.body, { new: true });
-            req.fornecedors = fornecedorALT;
+            const TransferenciaALT = await this.Transferencia.findByIdAndUpdate(req.params.id, req.body, { new: true });
+            req.transferencias = TransferenciaALT;
 
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });
         }
     }
-    async deleteFornecedor(req, res, next) {
+    async deleteTransferencia(req, res, next) {
         try {
-            await this.Fornecedor.findByIdAndDelete(req.params.id);
+            await this.transferencias.findByIdAndDelete(req.params.id);
             //res.Fornecedors = req.params.id;
             return next();
         } catch (err) {
@@ -51,4 +51,4 @@ class FornecedorMiddleware extends iFornecedorService {
 
     }
 }
-module.exports = FornecedorMiddleware;
+module.exports = TransferenciaMiddleware;

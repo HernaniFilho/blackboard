@@ -1,49 +1,21 @@
 const express = require('express');
 const Transferencia = require('../models/transferencia');
-const authenticate = require('../middleware/authMiddleware');
+const TransferenciaProxyService = require('../../KnowledgeSource/middleware/transferenciaMiddleware/transferenciaProxyService');
+
+const transferenciaMiddleware = new TransferenciaProxyService(Transferencia);
 
 const router = express.Router();
 
 // Criar transferencia
-router.post('/',  async (req, res)=> {
-    try {
-        const transferencia = new Transferencia(req.body);
-        await transferencia.save();
-        res.status(201).json(transferencia);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
+router.post('/', (req, res, next)=> transferenciaMiddleware.addTransferencia(req, res, next), (req, res) => transferenciaMiddleware.addTransferenciaCache(req, res));
 
 // Listar transferencia // ola
-router.get('/', async (req, res)=> {
-    try {
-        const transferencias = await Transferencia.find();
-        res.status(201).json(transferencias);
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-});
+router.get('/', (req, res, next)=> transferenciaMiddleware.listTransferencia(req, res, next), (req, res) => transferenciaMiddleware.updateCacheTransferencias(req, res));
 
-// Atualizar transferencia // Não deveria ser implementado
-router.put('/:id', async (req, res)=> {
-    /* try {
-        const transferencia = await Transferencia.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.status(201).json(transferencia);
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    } */
-   res.status(300).json({ message: 'Função não implementada!'});
-});
+// Atualizar transferencia
+router.put('/:id', (req, res, next)=> transferenciaMiddleware.updateTransferencia(req, res, next), (req, res)=> transferenciaMiddleware.updateTransferenciaCache(req, res));
 
 // Deletar transferencia
-router.delete('/:id', async (req, res)=> {
-    try {
-        await Transferencia.findByIdAndDelete(req.params.id);
-        res.status(201).json({ message: 'Transferencia removido com sucesso!' });
-    } catch (err) {
-        res.status(500).json({ error: err.message});
-    }
-});
+router.delete('/:id', (req, res, next)=> transferenciaMiddleware.deleteTransferencia(req, res, next), (req, res)=> transferenciaMiddleware.updateDelete(req, res));
 
 module.exports = router;

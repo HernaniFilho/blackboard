@@ -41,6 +41,6 @@ app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 app.use("/api/compras", compras);
 app.use("/api/fornecedores", fornecedores);
 app.use("/api/produtos", produtos);
-app.use("/api/tranferencias", tranferencias);
+app.use("/api/transferencias", tranferencias);
 app.use("/api/vendas", vendas);
 //app.use("/auth", auth);

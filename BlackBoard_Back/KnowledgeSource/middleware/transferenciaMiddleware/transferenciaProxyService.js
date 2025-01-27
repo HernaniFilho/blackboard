@@ -1,76 +1,76 @@
-const iFornecedorService = require('./iTransferenciaService');
-const FornecedorMiddleware = require('./transferenciaMiddleware');
+const iTransferenciaService = require('./iTransferenciaService');
+const TransferenciaMiddleware = require('./transferenciaMiddleware');
 
-class FornecedorProxyService extends iFornecedorService {
+class TransferenciaProxyService extends iTransferenciaService {
 
-    constructor(FornecedorModel) {
+    constructor(TransferenciaModel) {
         super();
-        this.FornecedorMiddleware = new FornecedorMiddleware(FornecedorModel);
-        this.fornecedores = [];
+        this.TransferenciaMiddleware = new TransferenciaMiddleware(TransferenciaModel);
+        this.transferencias = [];
         this.alterado = false;
-        this.addFornecedor = this.addFornecedor.bind(this);
-        this.listFornecedor = this.listFornecedor.bind(this);
-        this.updateCacheFornecedors = this.updateCacheFornecedors.bind(this);
-        this.updateFornecedor = this.updateFornecedor.bind(this);
-        this.deleteFornecedor = this.deleteFornecedor.bind(this);
-        this.updateFornecedorCache =this.updateFornecedorCache.bind(this);
+        this.addTransferencia = this.addTransferencia.bind(this);
+        this.listTransferencia = this.listTransferencia.bind(this);
+        this.updateCacheTransferencias = this.updateCacheTransferencias.bind(this);
+        this.updateTransferencia = this.updateTransferencia.bind(this);
+        this.deleteTransferencia = this.deleteTransferencia.bind(this);
+        this.updateTransferenciaCache =this.updateTransferenciaCache.bind(this);
     }
 
-    async addFornecedor(req, res, next) {
+    async addTransferencia(req, res, next) {
         this.alterado = true;
-        await this.FornecedorMiddleware.addFornecedor(req, res, next);
+        await this.TransferenciaMiddleware.addTransferencia(req, res, next);
     }
-    async listFornecedor(req, res, next) {
-        const loja = req.body.nomeLoja;
+    async listTransferencia(req, res, next) {
+        //const loja = req.headers.nomeloja;
 
-        if (this.alterado || this.fornecedores.length === 0) {
-            await this.FornecedorMiddleware.listFornecedor(req, res, next);
+        if (this.alterado || this.transferencias.length === 0) {
+            await this.TransferenciaMiddleware.listTransferencia(req, res, next);
         } else {
             console.log("PEGO DO PROXY");
             //const FornecedorsEmLoja = this.fornecedores.filter(Fornecedor => Fornecedor.nomeLoja === loja);
-            res.status(200).json(this.fornecedores);//FornecedorsEmLoja
+            res.status(200).json(this.transferencias);//FornecedorsEmLoja
         }
     }
 
-    async updateCacheFornecedors(req, res, next) {
-        this.fornecedores = req.Fornecedors;
+    async updateCacheTransferencias(req, res, next) {
+        this.transferencias = req.transferencias;
         this.alterado = false;
-        res.status(201).json(this.fornecedores);
+        res.status(201).json(this.transferencias);
     }
-    async updateFornecedor(req, res, next) {
+    async updateTransferencia(req, res, next) {
         this.alterado = true;
-        await this.FornecedorMiddleware.updateFornecedor(req, res, next);
+        await this.TransferenciaMiddleware.updateTransferencia(req, res, next);
     }
-    async updateFornecedorCache(req, res, next) {
+    async updateTransferenciaCache(req, res, next) {
         this.alterado = false;
-        const fornecedor = req.fornecedors;
+        const transferencia = req.transferencias;
 
-        const index = this.fornecedores.findIndex(f => String(f._id) === String(fornecedor._id));
+        const index = this.transferencias.findIndex(t => String(t._id) === String(transferencia._id));
 
-        this.fornecedores[index] = fornecedor;
-        res.status(201).json(fornecedor);
+        this.transferencias[index] = transferencia;
+        res.status(201).json(transferencia);
     }
 
     
-    async deleteFornecedor(req, res, next) {
+    async deleteTransferencia(req, res, next) {
         this.alterado = true;
-        await this.FornecedorMiddleware.deleteFornecedor(req, res, next);
+        await this.TransferenciaMiddleware.deleteTransferencia(req, res, next);
     }
 
     async updateDelete(req, res, next) {
         this.alterado = false;
-        const fornecedor = req.body;
+        //const transferencia = req.body;
 
-        const index = this.fornecedores.findIndex(f => f.nome === fornecedor.nome && f._id === req.params.id);
-        this.fornecedores.splice(index, 1);
-        res.status(201).json({ message: 'Fornecedor removido com sucesso!' });
+        const index = this.transferencias.findIndex(t => t._id === req.params.id);
+        this.transferencias.splice(index, 1);
+        res.status(201).json({ message: 'Transferencia removida com sucesso!' });
     }
-    async addFornecedorCache(req, res, next) {
-        const fornecedorAtualizado = req.fornecedors;
-        const index = this.fornecedores.push(fornecedorAtualizado);
+    async addTransferenciaCache(req, res, next) {
+        const transferenciaAtualizado = req.transferencias;
+        const index = this.transferencias.push(transferenciaAtualizado);
 
-        this.fornecedores[index] = fornecedorAtualizado;
+        this.transferencias[index] = transferenciaAtualizado;
         res.status(201).json(req.body);
     }
 }
-module.exports = FornecedorProxyService;
+module.exports = TransferenciaProxyService;
