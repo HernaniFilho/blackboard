@@ -22,6 +22,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
 export default function ConfirmarVenda({ open, handleClose }) {
   const nomeProduto = useVendaStore((state) => state.nomeProduto);
   const quantidade = useVendaStore((state) => state.quantidade);
+  const precoTotal = useVendaStore((state) => state.precoTotal);
   const setDataVenda = useVendaStore((state) => state.setData);
 
   const handleConfirmar = () => {
@@ -63,6 +64,9 @@ export default function ConfirmarVenda({ open, handleClose }) {
         </Typography>
         <Typography gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
           Quantidade: {quantidade}
+        </Typography>
+        <Typography gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}>
+          Total: {precoTotal.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
         </Typography>
         <Typography gutterBottom sx={{ mb: 2, fontWeight: 'bold' }}></Typography>
         <Typography gutterBottom sx={{ mt: 4, fontWeight: 'bold' }}>

@@ -34,24 +34,13 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-function createData(produto, estoque, qtd) {
-  return { produto, estoque, qtd };
-}
-
-const rows = [
-  createData('Product A', 159, 4.0),
-  createData('Product B', 237, 4.3),
-  createData('Product C', 262, 6.0),
-  createData('Product D', 305, 4.3),
-  createData('Product E', 356, 3.9),
-  createData('Product F', 366, 5.7),
-];
-
 export default function TableProducts() {
   const [quantities, setQuantities] = React.useState({});
   const [openModal, setOpenModal] = React.useState(false); // Estado para controlar o modal
   const setNomeProduto = useVendaStore((state) => state.setNomeProduto);
   const setQuantidade = useVendaStore((state) => state.setQuantidade);
+  const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
+  const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal)
 
   //Escopo Tabela
   const [produtos, setProdutos] = React.useState([]);
@@ -65,13 +54,17 @@ export default function TableProducts() {
 
   const handleRegistrarVenda = (produto) => {
     const quantidade = quantities[produto] || 0;
-    setNomeProduto(produto);
+    setNomeProduto(produto.nomeProduto);
     setQuantidade(quantidade);
+    setPrecoTotal(produto.preco * quantidade);
+    const produtoAtualizado = { ...produto };
+    produtoAtualizado.quantidade -= quantidade;
+    setProdutoPosVenda(produtoAtualizado);
+
     const estadoAtual = useVendaStore.getState();
     setOpenModal(true);
     console.log(`Produto: ${produto}, Quantidade: ${quantidade}`);
     console.log("Estado atual do Zustand:", estadoAtual); 
-    // Aqui você pode realizar outras ações, como enviar os dados para uma API
   };
 
 
@@ -282,7 +275,7 @@ export default function TableProducts() {
         {
           headers:
             { 
-              nomeLoja: 'LojaA' 
+              nomeLoja: 'Loja A' 
             }
         }
     ); // URL do seu backend
@@ -315,21 +308,25 @@ export default function TableProducts() {
             <TableRow>
               <StyledTableCell>Produtos</StyledTableCell>
               <StyledTableCell align="right">Estoque</StyledTableCell>
+              <StyledTableCell align="right">Preço unitário</StyledTableCell>
               <StyledTableCell align="right">Qtd para venda</StyledTableCell>
               <StyledTableCell align="right"> </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => (
-              <StyledTableRow key={row.produto}>
+            {produtos.map((row) => (
+              <StyledTableRow key={row._id}>
                 <StyledTableCell component="th" scope="row">
-                  {row.produto}
+                  {row.nomeProduto}
                 </StyledTableCell>
-                <StyledTableCell align="right">{row.estoque}</StyledTableCell>
+                <StyledTableCell align="right">{row.quantidade}</StyledTableCell>
+                <StyledTableCell align="right">
+                  {row.preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
+                </StyledTableCell>
                 <StyledTableCell align="right">
                   <SelectQTD
                     onChangeQuantity={(quantidade) =>
-                      handleChangeQuantity(row.produto, quantidade)
+                      handleChangeQuantity(row, quantidade)
                     }
                   />
                 </StyledTableCell>
@@ -337,7 +334,7 @@ export default function TableProducts() {
                   <Button
                     variant="contained"
                     endIcon={<SendIcon />}
-                    onClick={() => handleRegistrarVenda(row.produto)}
+                    onClick={() => handleRegistrarVenda(row)}
                   >
                     Registrar Venda
                   </Button>
