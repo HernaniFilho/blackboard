@@ -1,4 +1,5 @@
 import { useForm, Controller } from "react-hook-form";
+import { useEffect } from "react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import {
@@ -29,22 +30,41 @@ const style = {
   p: 4,
 };
 
-// 📌 Schema de validação com Yup
-const schema = yup.object().shape({
-  productName: yup.string().required("Nome do produto é obrigatório"),
-  supplierName: yup.string().required("Nome do fornecedor é obrigatório"),
-  price: yup
-    .number()
-    .typeError("O preço deve ser um número")
-    .positive("O preço deve ser maior que zero")
-    .required("O preço é obrigatório"),
-  quantity: yup
-    .number()
-    .typeError("A quantidade deve ser um número")
-    .min(1, "A quantidade deve ser pelo menos 1")
-    .required("A quantidade é obrigatória"),
-  store: yup.string().required("A loja é obrigatória"),
-});
+// 📌 Função para gerar o schema com validação condicional
+const getSchema = (pageType) => {
+  const baseSchema = {
+    nomeProduto: yup.string(),
+    preco: yup
+      .number()
+      .typeError("O preço deve ser um número")
+      .positive("O preço deve ser maior que zero")
+      .required("O preço é obrigatório"),
+  };
+
+  if (pageType === "orders") {
+    return yup.object().shape({
+      ...baseSchema,
+      nomeLoja: yup.string().required("A loja é obrigatória"),
+      quantidade: yup
+        .number()
+        .typeError("A quantidade deve ser um número")
+        .min(1, "A quantidade deve ser pelo menos 1")
+        .required("A quantidade é obrigatória"),
+      estoqueMin: yup
+        .number()
+        .typeError("A quantidade deve ser um número")
+        .min(1, "A quantidade deve ser pelo menos 1")
+        .required("A quantidade é obrigatória"),
+    });
+  } else if (pageType === "inventory") {
+    return yup.object().shape({
+      ...baseSchema,
+      nomeFornecedor: yup.string().required("Nome do fornecedor é obrigatório"),
+    });
+  }
+
+  return yup.object().shape(baseSchema);
+};
 
 export default function ProductModal({
   open,
@@ -57,146 +77,201 @@ export default function ProductModal({
   const {
     control,
     handleSubmit,
+    setValue,
     formState: { errors },
+    reset,
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(getSchema(pageType)),
   });
+
+  useEffect(() => {
+    if (productData) {
+      if (pageType === "orders") {
+        setValue("nomeProduto", productData.nomeProduto || "");
+        setValue("preco", productData.preco || "");
+        setValue("nomeLoja", productData.nomeLoja || "");
+        setValue("quantidade", productData.quantidade || "");
+        setValue("estoqueMin", productData.estoqueMin || "");
+      } else if (pageType === "inventory") {
+        setValue("nomeFornecedor", productData.nomeFornecedor || "");
+        setValue("nomeProduto", productData.nomeProduto || "");
+        setValue("preco", productData.preco || "");
+      }
+    }
+  }, [productData, setValue, pageType]);
+
+  const handleFormSubmit = (data) => {
+    console.log("handleFormSubmit called with data:", data);
+    onSubmit({ data, id: productData._id });
+    handleClose();
+  };
+
+  useEffect(() => {
+    console.log("Form errors:", errors);
+  }, [errors]);
+
+  useEffect(() => {
+    reset();
+  }, [pageType, reset]);
 
   return (
     <Modal open={open} onClose={handleClose}>
       <Box sx={style}>
-        <h2 style={{ textAlign: "center" }}>
-          {pageType !== "inventory"
-            ? "Adicionar novo Produto"
-            : "Adicionar novo Fornecedor"}
-        </h2>
+        <form onSubmit={handleSubmit(handleFormSubmit)}>
+          <h2 style={{ textAlign: "center" }}>
+            {pageType !== "inventory"
+              ? "Adicionar novo Produto"
+              : "Adicionar novo Fornecedor"}
+          </h2>
 
-        {/* Nome do Fornecedor */}
-        {pageType === "inventory" && (
+          {/* Nome do Fornecedor */}
+          {pageType === "inventory" && (
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <Controller
+                name="nomeFornecedor"
+                control={control}
+                defaultValue={productData.nomeFornecedor}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Nome do Fornecedor"
+                    variant="outlined"
+                    disabled
+                    error={!!errors.nomeFornecedor}
+                    helperText={errors.nomeFornecedor?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          )}
+
+          {/* Nome do Produto */}
           <FormControl fullWidth sx={{ mb: 2 }}>
             <Controller
-              name="nomeFornecedor"
+              name="nomeProduto"
               control={control}
-              defaultValue={productData.nome}
+              defaultValue={productData.nomeProduto}
               render={({ field }) => (
                 <TextField
                   {...field}
-                  label="Nome do Fornecedor"
+                  label="Nome do Produto"
                   variant="outlined"
-                  error={!!errors.supplierName}
-                  helperText={errors.supplierName?.message}
+                  disabled
+                  error={!!errors.nomeProduto}
+                  helperText={errors.nomeProduto?.message}
                 />
               )}
             />
           </FormControl>
-        )}
 
-        {/* Nome do Produto */}
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <Controller
-            name="productName"
-            control={control}
-            defaultValue={productData.nomeProduto}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                label="Nome do Produto"
-                variant="outlined"
-                error={!!errors.productName}
-                helperText={errors.productName?.message}
-              />
-            )}
-          />
-        </FormControl>
-
-        {/* Preço */}
-        <FormControl fullWidth sx={{ mb: 2 }}>
-          <InputLabel htmlFor="price">Preço</InputLabel>
-          <Controller
-            name="price"
-            control={control}
-            defaultValue={productData.preco}
-            render={({ field }) => (
-              <OutlinedInput
-                {...field}
-                id="price"
-                startAdornment={
-                  <InputAdornment position="start">R$</InputAdornment>
-                }
-                label="Preço"
-                error={!!errors.price}
-              />
-            )}
-          />
-          <p style={{ color: "red", fontSize: "12px" }}>
-            {errors.price?.message}
-          </p>
-        </FormControl>
-
-        {/* Loja */}
-        {pageType === "orders" && (
+          {/* Preço */}
           <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Loja</InputLabel>
+            <InputLabel htmlFor="price">Preço</InputLabel>
             <Controller
-              name="store"
+              name="preco"
               control={control}
-              defaultValue={productData.nomeLoja}
+              defaultValue={productData.preco}
               render={({ field }) => (
-                <Select {...field} label="Loja" error={!!errors.store}>
-                  <MenuItem value="A">Loja A</MenuItem>
-                  <MenuItem value="B">Loja B</MenuItem>
-                </Select>
+                <OutlinedInput
+                  {...field}
+                  id="price"
+                  startAdornment={
+                    <InputAdornment position="start">R$</InputAdornment>
+                  }
+                  label="Preço"
+                  error={!!errors.preco}
+                />
               )}
             />
             <p style={{ color: "red", fontSize: "12px" }}>
-              {errors.store?.message}
+              {errors.preco?.message}
             </p>
           </FormControl>
-        )}
 
-        {/* Quantidade */}
-        {pageType === "orders" && (
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <Controller
-              name="quantity"
-              control={control}
-              defaultValue={productData.quantidade}
-              render={({ field }) => (
-                <TextField
-                  {...field}
-                  label="Quantidade"
-                  type="number"
-                  variant="outlined"
-                  error={!!errors.quantity}
-                  helperText={errors.quantity?.message}
-                />
-              )}
-            />
-          </FormControl>
-        )}
+          {/* Loja */}
+          {pageType === "orders" && (
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Loja</InputLabel>
+              <Controller
+                name="nomeLoja"
+                control={control}
+                defaultValue={productData.nomeLoja}
+                render={({ field }) => (
+                  <Select {...field} label="Loja" error={!!errors.nomeLoja}>
+                    <MenuItem value="Loja A">Loja A</MenuItem>
+                    <MenuItem value="Loja B">Loja B</MenuItem>
+                    <MenuItem value="LojaC2">Loja C2</MenuItem>
+                  </Select>
+                )}
+              />
+              <p style={{ color: "red", fontSize: "12px" }}>
+                {errors.nomeLoja?.message}
+              </p>
+            </FormControl>
+          )}
 
-        {/* Botões */}
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            width: "100%",
-            mt: 2,
-          }}
-        >
-          <Button
-            sx={{ color: theme.palette.custom.navy }}
-            onClick={handleClose}
+          {/* Quantidade */}
+          {pageType === "orders" && (
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <Controller
+                name="quantidade"
+                control={control}
+                defaultValue={productData.quantidade}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Quantidade"
+                    type="number"
+                    variant="outlined"
+                    error={!!errors.quantidade}
+                    helperText={errors.quantidade?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          )}
+
+          {/* Estoque Mínimo */}
+          {pageType === "orders" && (
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <Controller
+                name="estoqueMin"
+                control={control}
+                defaultValue={productData.estoqueMin}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    label="Estoque Mínimo"
+                    type="number"
+                    variant="outlined"
+                    error={!!errors.estoqueMin}
+                    helperText={errors.estoqueMin?.message}
+                  />
+                )}
+              />
+            </FormControl>
+          )}
+
+          {/* Botões */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              mt: 2,
+            }}
           >
-            Fechar
-          </Button>
-          <Button
-            sx={{ color: theme.palette.custom.green }}
-            onClick={handleSubmit(onSubmit)}
-          >
-            Adicionar
-          </Button>
-        </Box>
+            <Button
+              sx={{ color: theme.palette.custom.navy }}
+              onClick={handleClose}
+            >
+              Fechar
+            </Button>
+            <Button type="submit" sx={{ color: theme.palette.custom.green }}>
+              Adicionar
+            </Button>
+          </Box>
+        </form>
       </Box>
     </Modal>
   );

@@ -10,9 +10,9 @@ import Venda from "./components/Venda";
 import Compra from "./components/Compra";
 import Transferencia from "./components/Transferencia";
 import Dashboard from "./components/Dashboard";
+import ErrorBoundary from "./ErrorBoundary";
 
 function App() {
-  const [count, setCount] = useState(0);
   const escolha = useStore((state) => state.escolha);
 
   const renderMainContent = () => {
@@ -26,7 +26,9 @@ function App() {
       case 2:
         return (
           <div>
-            <Fornecedores></Fornecedores>
+            <ErrorBoundary>
+              <Fornecedores></Fornecedores>
+            </ErrorBoundary>
           </div>
         );
       case 3:

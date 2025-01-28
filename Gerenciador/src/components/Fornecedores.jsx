@@ -1,5 +1,5 @@
 import StickyHeadTable from "./Tabelas/Table";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AddIcon from "@mui/icons-material/Add";
 import theme from "../assets/palette";
 import FormControl from "@mui/material/FormControl";
@@ -16,9 +16,11 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import useFornecedoresStore from "../state/FornecedoresStore";
+import ErrorBoundary from "../ErrorBoundary";
 
 const columns = [
-  { id: "nome", label: "Nome do Fornecedor", minWidth: 80 },
+  { id: "nomeFornecedor", label: "Nome do Fornecedor", minWidth: 80 },
   { id: "nomeProduto", label: "Produto", minWidth: 80 },
   {
     id: "preco",
@@ -26,31 +28,6 @@ const columns = [
     minWidth: 100,
     align: "right",
     format: (value) => value.toLocaleString("pt-BR"),
-  },
-  {
-    id: "quantidade",
-    label: "Quantidade",
-    minWidth: 80,
-    align: "right",
-    format: (value) => value.toLocaleString("pt-BR"),
-  },
-  {
-    id: "estoqueMin",
-    label: "Estoque Mínimo",
-    minWidth: 80,
-    align: "right",
-    format: (value) => value.toFixed(0),
-  },
-];
-
-const rows = [
-  {
-    id: 1,
-    nome: "SapatosDemais",
-    nomeProduto: "Sapatilha",
-    preco: 119.95,
-    quantidade: 190,
-    estoqueMin: 70,
   },
 ];
 
@@ -83,21 +60,12 @@ const schema = yup.object().shape({
     .typeError("O preço deve ser um número")
     .positive("O preço deve ser positivo")
     .required("O preço é obrigatório"),
-  quantidade: yup
-    .number()
-    .typeError("A quantidade deve ser um número")
-    .positive("A quantidade deve ser maior que zero")
-    .integer("A quantidade deve ser um número inteiro")
-    .required("A quantidade é obrigatória"),
-  estoqueMin: yup
-    .number()
-    .typeError("O estoque mínimo deve ser um número")
-    .positive("O estoque mínimo deve ser positivo")
-    .integer("O estoque mínimo deve ser um número inteiro")
-    .required("O estoque mínimo é obrigatório"),
 });
 
 function Fornecedores() {
+  const { fornecedores, loading, error, fetchFornecedores, addFornecedor } =
+    useFornecedoresStore();
+
   const [open, setOpen] = useState(false);
 
   const {
@@ -111,8 +79,6 @@ function Fornecedores() {
       nomeFornecedor: "",
       nomeProduto: "",
       preco: "",
-      quantidade: "",
-      estoqueMin: "",
     },
   });
 
@@ -123,14 +89,26 @@ function Fornecedores() {
   };
 
   const onSubmit = (data) => {
+    console.log(data);
+    addFornecedor(data);
     console.log("Fornecedor adicionado:", data);
     handleClose();
   };
 
+  useEffect(() => {
+    fetchFornecedores();
+  }, []);
+
   return (
     <>
       <div>
-        <StickyHeadTable columns={columns} rows={rows} pageType="inventory" />
+        <ErrorBoundary>
+          <StickyHeadTable
+            columns={columns}
+            rows={fornecedores}
+            pageType="inventory"
+          />
+        </ErrorBoundary>
       </div>
       <div style={{ padding: "16px" }}>
         <Fab
@@ -210,38 +188,6 @@ function Fornecedores() {
                       {errors.preco?.message}
                     </span>
                   </FormControl>
-                )}
-              />
-              <Controller
-                name="quantidade"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Quantidade"
-                    type="number"
-                    variant="outlined"
-                    error={!!errors.quantidade}
-                    helperText={errors.quantidade?.message}
-                  />
-                )}
-              />
-            </Box>
-            <Box sx={{ display: "flex", gap: 3, width: "100%", mt: 2 }}>
-              <Controller
-                name="estoqueMin"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Estoque Mínimo"
-                    type="number"
-                    variant="outlined"
-                    error={!!errors.estoqueMin}
-                    helperText={errors.estoqueMin?.message}
-                  />
                 )}
               />
             </Box>

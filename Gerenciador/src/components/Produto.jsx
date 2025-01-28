@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import StickyHeadTable from "./Tabelas/Table";
 import AddIcon from "@mui/icons-material/Add";
 import theme from "../assets/palette";
@@ -18,6 +18,7 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import useProdutosStore from "../state/ProdutoStore";
 
 const style = {
   position: "absolute",
@@ -64,17 +65,6 @@ const columns = [
   },
 ];
 
-const rows = [
-  {
-    id: 1,
-    nomeProduto: "Product A",
-    nomeLoja: "B",
-    preco: 25.99,
-    quantidade: 190,
-    estoqueMin: 70,
-  },
-];
-
 const schema = yup.object().shape({
   nomeProduto: yup.string().required("O nome do produto é obrigatório"),
   preco: yup
@@ -82,7 +72,7 @@ const schema = yup.object().shape({
     .typeError("O preço deve ser um número")
     .positive("O preço deve ser positivo")
     .required("O preço é obrigatório"),
-  loja: yup.string().required("Selecione uma loja"),
+  nomeLoja: yup.string().required("Selecione uma loja"),
   quantidade: yup
     .number()
     .typeError("A quantidade deve ser um número")
@@ -99,6 +89,8 @@ const schema = yup.object().shape({
 
 function Produto() {
   const [open, setOpen] = useState(false);
+  const { produtos, loading, error, fetchProdutos, addProduto } =
+    useProdutosStore();
 
   const {
     control,
@@ -110,7 +102,7 @@ function Produto() {
     defaultValues: {
       nomeProduto: "",
       preco: "",
-      loja: "",
+      nomeLoja: "",
       quantidade: "",
       estoqueMin: "",
     },
@@ -123,14 +115,21 @@ function Produto() {
   };
 
   const onSubmit = (data) => {
+    addProduto(data);
+    console.log(produtos);
     console.log("Produto adicionado:", data);
     handleClose();
   };
 
+  useEffect(() => {
+    fetchProdutos();
+    console.log("Produtos:", produtos);
+  }, []);
+
   return (
     <>
       <div>
-        <StickyHeadTable columns={columns} rows={rows} pageType="orders" />
+        <StickyHeadTable columns={columns} rows={produtos} pageType="orders" />
       </div>
       <div style={{ padding: "16px" }}>
         <Fab
@@ -205,17 +204,17 @@ function Produto() {
               />
 
               <Controller
-                name="loja"
+                name="nomeLoja"
                 control={control}
                 render={({ field }) => (
                   <FormControl fullWidth>
                     <InputLabel>Loja</InputLabel>
-                    <Select {...field} error={!!errors.loja}>
+                    <Select {...field} error={!!errors.nomeLoja}>
                       <MenuItem value="Loja A">Loja A</MenuItem>
                       <MenuItem value="Loja B">Loja B</MenuItem>
                     </Select>
                     <span style={{ color: "red", fontSize: "12px" }}>
-                      {errors.loja?.message}
+                      {errors.nomeLoja?.message}
                     </span>
                   </FormControl>
                 )}

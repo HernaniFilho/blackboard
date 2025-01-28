@@ -22,7 +22,9 @@ import {
   TableRow,
   FormControl,
 } from "@mui/material";
-import EditProductModal from "../../assets/modal"; // Import the reusable modal
+import EditProductModal from "../../assets/modal";
+import useProdutosStore from "../../state/ProdutoStore";
+import useFornecedoresStore from "../../state/FornecedoresStore";
 
 const style = {
   position: "absolute",
@@ -53,10 +55,17 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
     useConfirmationDialog();
   const [openEdit, setOpenEdit] = useState(false);
   const [productData, setProductData] = useState({});
+  const { deleteProduto, updateProduto } = useProdutosStore();
+  const { deleteFornecedor, updateFornecedor } = useFornecedoresStore();
 
   const handleDelete = (id) => {
+    console.log(id);
     openConfirmationDialog(() => {
-      console.log("Product with ID", id, "deleted");
+      if (pageType === "orders") {
+        deleteProduto(id);
+      } else {
+        deleteFornecedor(id);
+      }
       showSnackbar("Esse dado foi deletado", "warning");
     });
   };
@@ -71,7 +80,8 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
   };
 
   const handleOpenEdit = (row) => {
-    setProductData(row); // Pass selected row data
+    console.log("Editing product:", row);
+    setProductData(row);
     setOpenEdit(true);
   };
 
@@ -79,9 +89,16 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
     setOpenEdit(false);
   };
 
-  const handleSaveEdit = () => {
-    console.log("Updated Data:", productData);
-    showSnackbar("Esse dado foi alterado", "info");
+  const handleSaveEdit = (productData) => {
+    console.log("Updated Data:", productData.id);
+    if (pageType === "orders") {
+      updateProduto(productData, productData.id);
+      showSnackbar("Esse produto foi alterado", "info");
+    } else if (pageType === "inventory") {
+      updateFornecedor(productData, productData._id);
+      showSnackbar("Esse fornecedor foi alterado", "info");
+    }
+
     setOpenEdit(false);
   };
 
@@ -139,7 +156,7 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
                           color: theme.palette.custom.beige,
                           backgroundColor: theme.palette.custom.red,
                         }}
-                        onClick={() => handleDelete(row.id)}
+                        onClick={() => handleDelete(row._id)}
                       >
                         Excluir
                       </Button>

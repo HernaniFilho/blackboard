@@ -2,20 +2,20 @@ import { create } from "zustand";
 import { httpGet } from "../../app";
 import { baseUrl } from "../../baseurl";
 
-const useComprasStore = create((set) => ({
-  compras: [],
+const useVendasStore = create((set) => ({
+  vendas: [],
   loading: false,
   error: null,
 
-  fetchCompras: async () => {
+  fetchVendas: async () => {
     set({ loading: true, error: null });
+    console.log("Entrei aqui");
     try {
-      const data = await httpGet(`${baseUrl}/api/compras`, {
-        headers: { nomeloja: "LojaC2" },
-      });
+      const data = await httpGet(`${baseUrl}/api/vendas`);
+      console.log("Ola", data);
       set((state) => ({
         ...state,
-        compras: data,
+        vendas: data,
         loading: false,
       }));
     } catch (error) {
@@ -25,4 +25,4 @@ const useComprasStore = create((set) => ({
   },
 }));
 
-export default useComprasStore;
+export default useVendasStore;

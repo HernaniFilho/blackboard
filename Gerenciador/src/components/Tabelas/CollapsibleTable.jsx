@@ -18,9 +18,13 @@ import TablePagination from "@mui/material/TablePagination";
 function Row({ row, columns }) {
   const [open, setOpen] = React.useState(false);
 
-  const formataNumero = (number) => {
-    return number.toLocaleString("pt-BR");
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(value);
   };
+
   return (
     <React.Fragment>
       <TableRow sx={{ "& > *": { borderBottom: "unset" } }}>
@@ -35,49 +39,39 @@ function Row({ row, columns }) {
         </TableCell>
 
         {columns
-          .filter((column) => column.id !== "produto")
-          .map((column) => {
-            const value = row[column.id];
-            return (
-              <TableCell key={column.id} align={column.align}>
-                {column.format && typeof value === "number"
-                  ? column.format(value)
-                  : value}
-              </TableCell>
-            );
-          })}
+          .filter((column) => !["produtos", "_id", "__v"].includes(column.id))
+          .map((column) => (
+            <TableCell key={column.id} align={column.align}>
+              {column.id === "data"
+                ? new Date(row[column.id]).toLocaleDateString()
+                : row[column.id]}
+            </TableCell>
+          ))}
       </TableRow>
+
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box sx={{ margin: 1 }}>
               <Typography variant="h6" gutterBottom component="div">
-                Produtos
+                Detalhes do Produto
               </Typography>
               <Table size="small" aria-label="products">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Nome</TableCell>
-                    <TableCell>Loja</TableCell>
-                    <TableCell align="right">Preço</TableCell>
+                    <TableCell>Nome do Produto</TableCell>
                     <TableCell align="right">Quantidade</TableCell>
-                    <TableCell align="right">Total</TableCell>
+                    <TableCell align="right">Preço Total</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.produto.map((produto) => (
-                    <TableRow key={produto.nome}>
-                      <TableCell component="th" scope="row">
-                        {produto.nome}
-                      </TableCell>
-                      <TableCell>{produto.nomeLoja}</TableCell>
-                      <TableCell align="right">{produto.preco}</TableCell>
-                      <TableCell align="right">{produto.quantidade}</TableCell>
-                      <TableCell align="right">
-                        {formataNumero(produto.preco * produto.quantidade)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  <TableRow>
+                    <TableCell>{row.nomeProduto}</TableCell>
+                    <TableCell align="right">{row.quantidade}</TableCell>
+                    <TableCell align="right">
+                      {formatCurrency(row.precoTotal)}
+                    </TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </Box>
@@ -108,7 +102,9 @@ export default function CollapsibleTable({ columns, rows }) {
           <TableRow>
             <TableCell />
             {columns
-              .filter((column) => column.id !== "produto")
+              .filter(
+                (column) => !["produtos", "_id", "__v"].includes(column.id)
+              )
               .map((column) => (
                 <TableCell
                   key={column.id}
@@ -124,7 +120,7 @@ export default function CollapsibleTable({ columns, rows }) {
           {rows
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((row) => (
-              <Row key={row.nome} row={row} columns={columns} />
+              <Row key={row._id} row={row} columns={columns} />
             ))}
         </TableBody>
       </Table>
