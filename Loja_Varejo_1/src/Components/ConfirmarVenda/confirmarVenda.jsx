@@ -9,6 +9,8 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import useVendaStore from '../../Zustand/zustand';
+import { httpGet, httpPut } from '../../../app';
+import { useNavigate } from "react-router-dom";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
@@ -19,11 +21,61 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
+
+async function fetchProdutos() {
+  try {
+    console.log("To em fetchProdutos 1");
+    const response = await httpGet(
+      //colocar baseurl
+      'http://localhost:3000/api/produtos',
+      {
+        headers: 
+          {
+            nomeloja: "Loja A"
+          }
+      }
+    ); // URL do seu backend
+    console.log("To em fetchProdutos 2");
+    //setProdutos(response); // Atualiza o estado com os dados retornados
+    console.log("Response fetchProdutos:", response); // Exibe os dados no console
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+    //setProdutos([]); 
+  }
+};
+
+async function putProduto(p, id) {
+  try {
+    console.log("To em putProduto 1");
+    const response = await httpPut(
+      //colocar baseurl
+      `http://localhost:3000/api/produtos/${id}`,
+      p
+    ); // URL do seu backend
+    console.log("To em putProduto 2");
+    console.log("Response putProduto:", response); // Exibe os dados no console
+    await fetchProdutos();
+  } catch (error) {
+    console.error("Erro ao buscar produtos:", error);
+  }
+};
+
+
 export default function ConfirmarVenda({ open, handleClose }) {
   const nomeProduto = useVendaStore((state) => state.nomeProduto);
   const quantidade = useVendaStore((state) => state.quantidade);
   const precoTotal = useVendaStore((state) => state.precoTotal);
   const setDataVenda = useVendaStore((state) => state.setData);
+  const navigate = useNavigate();
+  const timer = () => {
+    setTimeout(() => {
+      navigate("/");  // Redireciona após o tempo definido
+      window.scrollTo({
+        top: 0,
+        behavior: 'auto' // Isso adiciona uma rolagem suave
+    });
+    }, 2000);
+  };
 
   const handleConfirmar = () => {
     // Obtendo a data e salvando no Zustand
@@ -31,8 +83,26 @@ export default function ConfirmarVenda({ open, handleClose }) {
     setDataVenda(dataAtual); // Salva a data atual no Zustand
     const estadoAtual = useVendaStore.getState();
     console.log(estadoAtual);
+
+    console.log("Teste:", estadoAtual.produtoPosVenda._id);
+    const idProduto = estadoAtual.produtoPosVenda._id;
+
+    const produtoVendido = { 
+      nomeProduto: estadoAtual.produtoPosVenda.nomeProduto,
+      preco: estadoAtual.produtoPosVenda.preco,
+      quantidade: estadoAtual.produtoPosVenda.quantidade,
+      estoqueMin: estadoAtual.produtoPosVenda.estoqueMin,
+      nomeLoja: "Loja A"
+    };
+
+    fetchProdutos();
+    putProduto(produtoVendido, idProduto);
+    timer();
+    window.location.reload();
     handleClose(); // Fecha o modal após salvar a data
+    
   };
+  
 
   return (
     <BootstrapDialog

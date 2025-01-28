@@ -40,7 +40,8 @@ export default function TableProducts() {
   const setNomeProduto = useVendaStore((state) => state.setNomeProduto);
   const setQuantidade = useVendaStore((state) => state.setQuantidade);
   const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
-  const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal)
+  const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal);
+
 
   //Escopo Tabela
   const [produtos, setProdutos] = React.useState([]);
@@ -261,11 +262,6 @@ export default function TableProducts() {
   fetchProdutos();
   }, []);*/
 
-
-
-
-  //GET
-  React.useEffect(() => {
   async function fetchProdutos() {
     try {
       console.log("To em fetchProdutos 1");
@@ -278,7 +274,7 @@ export default function TableProducts() {
               nomeLoja: 'Loja A' 
             }
         }
-    ); // URL do seu backend
+      ); // URL do seu backend
       console.log("To em fetchProdutos 2");
       setProdutos(response); // Atualiza o estado com os dados retornados
       console.log("Response fetchProdutos:", response); // Exibe os dados no console
@@ -292,7 +288,14 @@ export default function TableProducts() {
     }
   }
 
-  fetchProdutos()
+
+
+  //GET
+  React.useEffect(() => {
+
+
+
+  fetchProdutos();
   //console.log("produtosssssssss:", lp);
   //const rows = produtos;
 
