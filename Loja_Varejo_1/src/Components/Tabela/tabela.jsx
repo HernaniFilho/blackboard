@@ -14,6 +14,7 @@ import useVendaStore from '../../Zustand/zustand';
 import ConfirmarVenda from '../ConfirmarVenda/confirmarVenda';
 //import { listarProdutos } from '../../Services/services';
 import { httpDelete, httpGet , httpPost, httpPut} from '../../../app';
+import Snackbar from '@mui/material/Snackbar';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -41,20 +42,26 @@ export default function TableProducts() {
   const setQuantidade = useVendaStore((state) => state.setQuantidade);
   const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
   const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal);
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
 
   //Escopo Tabela
   const [produtos, setProdutos] = React.useState([]);
   
-  const handleChangeQuantity = (produto, quantidade) => {
+  const handleChangeQuantity = (produtoId, quantidade) => {
     setQuantities((prev) => ({
       ...prev,
-      [produto]: quantidade,
+      [produtoId]: quantidade,
     }));
   };
 
   const handleRegistrarVenda = (produto) => {
-    const quantidade = quantities[produto] || 0;
+    const quantidade = quantities[produto._id] || 0;
+
+    if (quantidade === 0) {
+      setSnackbarOpen(true); // Exibe o aviso no Snackbar
+      return;
+    }
     setNomeProduto(produto.nomeProduto);
     setQuantidade(quantidade);
     setPrecoTotal(produto.preco * quantidade);
@@ -329,7 +336,7 @@ export default function TableProducts() {
                 <StyledTableCell align="right">
                   <SelectQTD
                     onChangeQuantity={(quantidade) =>
-                      handleChangeQuantity(row, quantidade)
+                      handleChangeQuantity(row._id, quantidade)
                     }
                   />
                 </StyledTableCell>
@@ -350,6 +357,13 @@ export default function TableProducts() {
 
       {/* Passa o estado openModal e o método handleCloseModal para o componente ConfirmarVenda */}
       <ConfirmarVenda open={openModal} handleClose={() => setOpenModal(false)} />
-    </>
-  );
+         {/* Snackbar para o aviso */}
+    <Snackbar
+      open={snackbarOpen}
+      autoHideDuration={3000}
+      onClose={() => setSnackbarOpen(false)}
+      message="Por favor, selecione a quantidade antes de registrar a venda."
+    />
+  </>
+);
 }
