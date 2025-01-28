@@ -87,7 +87,7 @@ export default function TableProducts() {
 
   //POST
   /*
-  React.useEffect(() => {
+  React.useEffect(() => { 
     //Popula a cache
     async function fetchProdutos() {
       try {
@@ -98,7 +98,7 @@ export default function TableProducts() {
           {
             headers: 
               {
-                nomeloja: "LojaA"
+                nomeloja: "Loja A"
               }
           }
         ); // URL do seu backend
@@ -119,7 +119,7 @@ export default function TableProducts() {
         preco: 0.1,
         quantidade: 3,
         estoqueMin: 5,
-        nomeLoja: 'LojaA'
+        nomeLoja: 'Loja A'
       };
       const response = await httpPost(
         //colocar baseurl
@@ -151,7 +151,7 @@ export default function TableProducts() {
         {
           headers: 
             {
-              nomeloja: "LojaA"
+              nomeloja: "Loja A"
             }
         }
       ); // URL do seu backend
@@ -173,7 +173,7 @@ export default function TableProducts() {
         preco: 0.8,
         quantidade: 8,
         estoqueMin: 5,
-        nomeLoja: 'LojaA'
+        nomeLoja: 'Loja A'
       };
       const response = await httpPut(
         //colocar baseurl
@@ -206,7 +206,7 @@ export default function TableProducts() {
         {
           headers: 
             {
-              nomeloja: "LojaA"
+              nomeloja: "Loja A"
             }
         }
       ); // URL do seu backend
@@ -251,7 +251,7 @@ export default function TableProducts() {
         preco: 5,
         quantidade: 1,
         estoqueMin: 5,
-        nomeLoja: 'LojaA'
+        nomeLoja: 'Loja A'
       };
       console.log("Teste:", produto)
       const response = await httpPut(
@@ -294,21 +294,13 @@ export default function TableProducts() {
       setProdutos([]); 
     }
   }
-
-
-
+  
   //GET
   React.useEffect(() => {
-
-
-
   fetchProdutos();
   //console.log("produtosssssssss:", lp);
   //const rows = produtos;
-
-}, []);
-
-  
+  }, []);
 
   return (
     <>

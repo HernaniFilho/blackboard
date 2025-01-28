@@ -9,7 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import useVendaStore from '../../Zustand/zustand';
-import { httpGet, httpPut } from '../../../app';
+import { httpPost, httpGet, httpPut } from '../../../app';
 import { useNavigate } from "react-router-dom";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
@@ -61,6 +61,50 @@ async function putProduto(p, id) {
 };
 
 
+
+//Popula a cache
+async function fetchVendas() {
+  try {
+    console.log("To em fetchVendas 1");
+    const response = await httpGet(
+      //colocar baseurl
+      'http://localhost:3000/api/vendas',
+      {
+        headers: 
+          {
+            nomeloja: "Loja A"
+          }
+      }
+    ); // URL do seu backend
+    console.log("To em fetchVendas 2");
+    console.log("Response fetchVendas:", response); // Exibe os dados no console
+  } catch (error) {
+    console.error("Erro ao buscar vendas:", error);
+  }
+};
+
+async function postVenda(produtoVenda) {
+  try {
+    console.log("To em postVenda 1");
+    console.log("produtoVenda: ", produtoVenda);
+    /*const produto = {
+      nomeLoja: 'Loja A',
+      nomeProduto: "Exemplo 3",
+      quantidade: 3,
+      data: new Date(),
+      precoTotal: 5
+    };*/
+    const response = await httpPost(
+      //colocar baseurl
+      'http://localhost:3000/api/vendas/', produtoVenda); // URL do seu backend
+    console.log("To em postVenda 2");
+    console.log("Response postVenda:", response); // Exibe os dados no console
+  } catch (error) {
+    console.error("Erro ao buscar vendas:", error);
+  }
+};
+
+
 export default function ConfirmarVenda({ open, handleClose }) {
   const nomeProduto = useVendaStore((state) => state.nomeProduto);
   const quantidade = useVendaStore((state) => state.quantidade);
@@ -95,10 +139,27 @@ export default function ConfirmarVenda({ open, handleClose }) {
       nomeLoja: "Loja A"
     };
 
+    const produtoPostVenda = {
+      nomeLoja: "Loja A",
+      nomeProduto: nomeProduto,
+      quantidade: quantidade,
+
+
+
+      data: dataAtual, //OBSERVAÇÃO: VALIDAR "dataAtual"
+
+
+
+      precoTotal: precoTotal      
+    }
+    console.log("produtoPostVenda: ", produtoPostVenda);
+
     fetchProdutos();
     putProduto(produtoVendido, idProduto);
+    fetchVendas();
+    postVenda(produtoPostVenda);
     timer();
-    window.location.reload();
+    /*window.location.reload();*/
     handleClose(); // Fecha o modal após salvar a data
     
   };
