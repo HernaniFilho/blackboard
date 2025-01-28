@@ -269,6 +269,11 @@ export default function TableProducts() {
   fetchProdutos();
   }, []);*/
 
+
+
+
+  //GET
+  React.useEffect(() => {
   async function fetchProdutos() {
     try {
       console.log("To em fetchProdutos 1");
@@ -278,10 +283,10 @@ export default function TableProducts() {
         {
           headers:
             { 
-              nomeLoja: 'Loja A' 
+              nomeLoja: 'LojaA' 
             }
         }
-      ); // URL do seu backend
+    ); // URL do seu backend
       console.log("To em fetchProdutos 2");
       setProdutos(response); // Atualiza o estado com os dados retornados
       console.log("Response fetchProdutos:", response); // Exibe os dados no console
@@ -294,18 +299,9 @@ export default function TableProducts() {
       setProdutos([]); 
     }
   }
-
-
-
-  //GET
-  React.useEffect(() => {
-
-
-
   fetchProdutos();
   //console.log("produtosssssssss:", lp);
   //const rows = produtos;
-
 }, []);
 
   
