@@ -63,10 +63,11 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
     openConfirmationDialog(() => {
       if (pageType === "orders") {
         deleteProduto(id);
+        showSnackbar("Esse produto foi deletado", "warning");
       } else {
         deleteFornecedor(id);
+        showSnackbar("Esse fornecedor foi deletado", "warning");
       }
-      showSnackbar("Esse dado foi deletado", "warning");
     });
   };
 
@@ -92,10 +93,10 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
   const handleSaveEdit = (productData) => {
     console.log("Updated Data:", productData.id);
     if (pageType === "orders") {
-      updateProduto(productData, productData.id);
+      updateProduto(productData.data, productData.id);
       showSnackbar("Esse produto foi alterado", "info");
     } else if (pageType === "inventory") {
-      updateFornecedor(productData, productData._id);
+      updateFornecedor(productData.data, productData.id);
       showSnackbar("Esse fornecedor foi alterado", "info");
     }
 

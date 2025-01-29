@@ -20,7 +20,6 @@ const useProdutosStore = create((set, get) => ({
         loading: false,
       }));
     } catch (error) {
-      console.log("Erro:" + error);
       set((state) => ({ ...state, error, loading: false }));
     }
   },
@@ -33,10 +32,8 @@ const useProdutosStore = create((set, get) => ({
         produtos: [...state.produtos, newProduto],
         loading: false,
       }));
-      console.log(newProduto);
       get().fetchProdutos();
     } catch (error) {
-      console.log("Error: ", error);
       set({ error, loading: false });
     }
   },
@@ -46,10 +43,10 @@ const useProdutosStore = create((set, get) => ({
     try {
       console.log("data", id);
       const { __v, _id, ...dataToSend } = updatedData;
-      console.log("Data to send:", dataToSend.data);
+      console.log("Data to send:", dataToSend);
       const updatedProduto = await httpPut(
         `${baseUrl}/api/produtos/${id}`,
-        dataToSend.data
+        dataToSend
       );
       set((state) => ({
         produtos: state.produtos.map((produto) =>
@@ -57,10 +54,8 @@ const useProdutosStore = create((set, get) => ({
         ),
         loading: false,
       }));
-      console.log("UpdatedProduto: ", updatedProduto);
       get().fetchProdutos();
     } catch (error) {
-      console.log("Erro", error);
       set({ error, loading: false });
     }
   },

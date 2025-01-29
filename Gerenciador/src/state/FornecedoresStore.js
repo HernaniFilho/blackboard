@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { httpGet, httpPost, httpPut, httpDelete } from "../../app";
 import { baseUrl } from "../../baseurl";
 
-const useFornecedoresStore = create((set) => ({
+const useFornecedoresStore = create((set, get) => ({
   fornecedores: [],
   loading: false,
   error: null,
@@ -38,40 +38,38 @@ const useFornecedoresStore = create((set) => ({
         compras: [...state.fornecedores, newFornecedor],
         loading: false,
       }));
+      get().fetchFornecedores();
     } catch (error) {
       console.log("Error: ", error);
       set({ error, loading: false });
     }
   },
 
-  updateFornecedor: async (id, updatedData) => {
+  updateFornecedor: async (updatedData, id) => {
     set({ loading: true, error: null });
+    console.log(updatedData);
     try {
       const updatedFornecedores = await httpPut(
         `${baseUrl}/api/fornecedores/${id}`,
         updatedData
       );
-      set((state) => ({
-        Fornecedores: state.Fornecedores.map((fornecedores) =>
-          fornecedores.id === id ? updatedFornecedores : fornecedores
-        ),
+      set(() => ({
         loading: false,
       }));
+      get().fetchFornecedores();
     } catch (error) {
       set({ error, loading: false });
     }
   },
 
-  deleteFornecedores: async (id) => {
+  deleteFornecedor: async (id) => {
     set({ loading: true, error: null });
     try {
-      await httpDelete(`${baseUrl}/api/Fornecedores`);
+      await httpDelete(`${baseUrl}/api/fornecedores/${id}`);
       set((state) => ({
-        Fornecedores: state.Fornecedores.filter(
-          (compra) => fornecedores.id !== id
-        ),
         loading: false,
       }));
+      get().fetchFornecedores();
     } catch (error) {
       set({ error, loading: false });
     }
