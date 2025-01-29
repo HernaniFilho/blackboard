@@ -23,6 +23,23 @@ const useTransferenciasStore = create((set) => ({
       set((state) => ({ ...state, error, loading: false }));
     }
   },
+
+  addTransferencia: async (Transferencia) => {
+    set({ loading: true, error: null });
+    try {
+      const newTransferencia = await httpPost(
+        `${baseUrl}/api/transferencias`,
+        Transferencia
+      );
+      set((state) => ({
+        transferencias: [...state.transferencias, newTransferencia],
+        loading: false,
+      }));
+      get().fetchTransferencias();
+    } catch (error) {
+      set({ error, loading: false });
+    }
+  },
 }));
 
 export default useTransferenciasStore;

@@ -31,6 +31,7 @@ const style = {
 };
 
 // 📌 Função para gerar o schema com validação condicional
+// Talvez aqui caiba o padrão strategy
 const getSchema = (pageType) => {
   const baseSchema = {
     nomeProduto: yup.string(),

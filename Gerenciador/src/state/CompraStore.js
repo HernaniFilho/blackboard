@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { httpGet } from "../../app";
 import { baseUrl } from "../../baseurl";
 
-const useComprasStore = create((set) => ({
+const useComprasStore = create((set, get) => ({
   compras: [],
   loading: false,
   error: null,
@@ -21,6 +21,20 @@ const useComprasStore = create((set) => ({
     } catch (error) {
       console.log(error);
       set((state) => ({ ...state, error, loading: false }));
+    }
+  },
+
+  addCompras: async (compra) => {
+    set({ loading: true, error: null });
+    try {
+      const newCompra = await httpPost(`${baseUrl}/api/compras`, compra);
+      set((state) => ({
+        compras: [...state.compras, newCompra],
+        loading: false,
+      }));
+      get().fetchCompras();
+    } catch (error) {
+      set({ error, loading: false });
     }
   },
 }));
