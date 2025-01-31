@@ -21,12 +21,16 @@ class produtoProxyService extends iProdutoService {
     }
     async listProduto(req, res, next) {
         const loja = req.headers.nomeloja;
-
+        var produtosEmLoja = [];
         if (this.alterado || this.produtos.length === 0) {
             await this.produtoMiddleware.listProduto(req, res, next);
         } else {
             console.log("Peguei do Proxy")
-            const produtosEmLoja = this.produtos.filter(produto => produto.nomeLoja === loja);
+            if(loja !== "") {
+                produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
+            } else {
+                produtosEmLoja = this.produtos;
+            }
             res.status(200).json(produtosEmLoja);
         }
     }
@@ -35,7 +39,12 @@ class produtoProxyService extends iProdutoService {
         this.produtos = req.produtos;
         this.alterado = false;
         const loja = req.headers.nomeloja;//const loja = req.headers.nomeLoja;
-        const produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
+        var produtosEmLoja = [];
+        if(loja !== "") {
+            produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
+        } else {
+            produtosEmLoja = this.produtos;
+        }
         res.status(201).json(produtosEmLoja);
     }
 
