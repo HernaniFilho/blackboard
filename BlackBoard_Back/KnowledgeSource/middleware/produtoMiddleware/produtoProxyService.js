@@ -26,7 +26,7 @@ class produtoProxyService extends iProdutoService {
             await this.produtoMiddleware.listProduto(req, res, next);
         } else {
             console.log("Peguei do Proxy")
-            if(loja !== "") {
+            if(loja !== "z") {
                 produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
             } else {
                 produtosEmLoja = this.produtos;
@@ -40,7 +40,7 @@ class produtoProxyService extends iProdutoService {
         this.alterado = false;
         const loja = req.headers.nomeloja;//const loja = req.headers.nomeLoja;
         var produtosEmLoja = [];
-        if(loja !== "") {
+        if(loja !== "z") {
             produtosEmLoja = this.produtos.filter(produtos => produtos.nomeLoja === loja);
         } else {
             produtosEmLoja = this.produtos;
