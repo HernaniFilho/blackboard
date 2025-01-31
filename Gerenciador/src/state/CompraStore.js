@@ -1,20 +1,40 @@
 import { create } from "zustand";
-import axios from "axios";
+import { httpGet } from "../../app";
+import { baseUrl } from "../../baseurl";
 
-
-const useComprasStore = create((set) => ({
+const useComprasStore = create((set, get) => ({
   compras: [],
   loading: false,
   error: null,
 
   fetchCompras: async () => {
     set({ loading: true, error: null });
-
     try {
-      const response = await axios.get("");
-      set({ compras: response.data, loading: false });
-    } catch (err) {
-      set({ error: err.message, loading: false });
+      const data = await httpGet(`${baseUrl}/api/compras`, {
+        headers: { nomeloja: "LojaC2" },
+      });
+      set((state) => ({
+        ...state,
+        compras: data,
+        loading: false,
+      }));
+    } catch (error) {
+      console.log(error);
+      set((state) => ({ ...state, error, loading: false }));
+    }
+  },
+
+  addCompras: async (compra) => {
+    set({ loading: true, error: null });
+    try {
+      const newCompra = await httpPost(`${baseUrl}/api/compras`, compra);
+      set((state) => ({
+        compras: [...state.compras, newCompra],
+        loading: false,
+      }));
+      get().fetchCompras();
+    } catch (error) {
+      set({ error, loading: false });
     }
   },
 }));

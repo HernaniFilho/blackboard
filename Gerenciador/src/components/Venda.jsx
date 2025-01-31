@@ -1,8 +1,10 @@
 import CollapsibleTable from "./Tabelas/CollapsibleTable";
+import useVendasStore from "../state/Venda";
+import React, { useEffect } from "react";
 
 const columns = [
   { id: "nomeLoja", label: "Nome da Loja", minWidth: 220 },
-  { id: "produto", label: "Produto", minWidth: 100 },
+  { id: "nomeProduto", label: "Produto", minWidth: 100 },
   { id: "data", label: "Data", minWidth: 220 },
 ];
 
@@ -17,12 +19,17 @@ const rows = [
   },
 ];
 
-function Transferencia() {
+function Venda() {
+  const { vendas, loading, error, fetchVendas } = useVendasStore();
+  useEffect(() => {
+    fetchVendas();
+    console.log(vendas);
+  }, [fetchVendas]);
   return (
     <div>
-      <CollapsibleTable columns={columns} rows={rows} />
+      <CollapsibleTable columns={columns} rows={vendas} />
     </div>
   );
 }
 
-export default Transferencia;
+export default Venda;
