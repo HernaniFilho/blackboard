@@ -78,6 +78,7 @@ async function fetchVendas() {
     ); // URL do seu backend
     console.log("To em fetchVendas 2");
     console.log("Response fetchVendas:", response); // Exibe os dados no console
+    await fetchVendas();
   } catch (error) {
     console.error("Erro ao buscar vendas:", error);
   }
@@ -99,6 +100,7 @@ async function postVenda(produtoVenda) {
       'http://localhost:3000/api/vendas/', produtoVenda); // URL do seu backend
     console.log("To em postVenda 2");
     console.log("Response postVenda:", response); // Exibe os dados no console
+    await fetchVendas();
   } catch (error) {
     console.error("Erro ao buscar vendas:", error);
   }
