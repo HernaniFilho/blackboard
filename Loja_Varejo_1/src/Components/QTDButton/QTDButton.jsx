@@ -5,7 +5,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { alignProperty } from '@mui/material/styles/cssUtils';
 
-export default function SelectQTD({ onChangeQuantity }) {
+export default function SelectQTD({ onChangeQuantity, maxQuantidade}) {
   const [qtd, setQtd] = React.useState('');
 
   const handleChange = (event) => {
@@ -16,7 +16,8 @@ export default function SelectQTD({ onChangeQuantity }) {
     }
   };
 
-  const menuItems = Array.from({ length: 10 }, (_, index) => (
+  const limiteMaximo = Math.min(10, maxQuantidade);
+  const menuItems = Array.from({ length: limiteMaximo }, (_, index) => (
     <MenuItem key={index + 1} value={index + 1}>
       {index + 1}
     </MenuItem>

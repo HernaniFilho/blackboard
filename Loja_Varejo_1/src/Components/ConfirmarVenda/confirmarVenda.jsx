@@ -159,7 +159,7 @@ export default function ConfirmarVenda({ open, handleClose }) {
     fetchVendas();
     postVenda(produtoPostVenda);
     timer();
-    /*window.location.reload();*/
+    window.location.reload();
     handleClose(); // Fecha o modal após salvar a data
     
   };

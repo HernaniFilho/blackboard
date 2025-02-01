@@ -16,13 +16,19 @@ import ConfirmarVenda from '../ConfirmarVenda/confirmarVenda';
 import { httpDelete, httpGet , httpPost, httpPut} from '../../../app';
 import Snackbar from '@mui/material/Snackbar';
 
+const StyledTableCell2 = styled(TableCell)(({ theme }) => ({
+  '&.low-stock': {
+    color: 'red'
+  },
+}));
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.common.black,
     color: theme.palette.common.white,
   },
   [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
+    fontSize: 14, 
   },
 }));
 
@@ -321,15 +327,16 @@ export default function TableProducts() {
                 <StyledTableCell component="th" scope="row">
                   {row.nomeProduto}
                 </StyledTableCell>
-                <StyledTableCell align="right">{row.quantidade}</StyledTableCell>
+                <StyledTableCell2 align="right" className={row.quantidade < row.estoqueMin ? 'low-stock' : ''}>
+                {row.quantidade} / {row.estoqueMin}
+              </StyledTableCell2>
                 <StyledTableCell align="right">
                   {row.preco.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}
                 </StyledTableCell>
                 <StyledTableCell align="right">
                   <SelectQTD
-                    onChangeQuantity={(quantidade) =>
-                      handleChangeQuantity(row._id, quantidade)
-                    }
+                    onChangeQuantity={(quantidade) => handleChangeQuantity(row._id, quantidade) }
+                    maxQuantidade= {row.quantidade}
                   />
                 </StyledTableCell>
                 <StyledTableCell align="right">
