@@ -43,22 +43,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 export default function TableProducts() {
 
-  const eventSource = new EventSource('http://localhost:3000/api/notify');
+ 
 
-  // Listen for product-updated events
-  eventSource.addEventListener('change', (event) => {
-    const flag = JSON.parse(event.data);
-    console.log("\n\nFLAG:", flag);
-    useVendaStore.getState().updateFlag(flag);
-    console.log("\n\nFLAG updated:", flag);
-  });
-
-
-  // Handle errors
-  eventSource.onerror = (error) => {
-    console.error('SSE error:', error);
-    // Optionally, reconnect or handle the error
-  };
   const [quantities, setQuantities] = React.useState({});
   const [openModal, setOpenModal] = React.useState(false); // Estado para controlar o modal
   const setNomeProduto = useVendaStore((state) => state.setNomeProduto);
@@ -66,8 +52,72 @@ export default function TableProducts() {
   const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
   const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const setFlag = useVendaStore((state) => state.setFlag);
-  const flag = useVendaStore((state) => state.flag);
+  //const setFlag = useVendaStore((state) => state.setFlag);
+  const flagCounter = useVendaStore((state) => state.flagCounter);
+
+  React.useEffect(() => {
+    // Cria a conexão SSE somente quando o componente é montado.
+    const eventSource = new EventSource('http://localhost:3000/api/notify');
+    eventSource.onopen = (e) => {
+      console.log("SSE connection established:", e);
+    };
+
+    eventSource.onmessage = (event) => {
+      console.log("onmessage event received:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Parsed payload (onmessage):", payload);
+        useVendaStore.getState().setFlagCounter();
+        console.log("flagCounter after onmessage:", useVendaStore.getState().flagCounter);
+      } catch (err) {
+        console.error("Error parsing onmessage event.data:", err);
+      }
+    };
+
+    eventSource.addEventListener('change', (event) => {
+      console.log("Evento SSE 'change' received:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Parsed payload in 'change':", payload);
+        useVendaStore.getState().setFlagCounter();
+        console.log("flagCounter after 'change':", useVendaStore.getState().flagCounter);
+      } catch (err) {
+        console.error("Error parsing event.data in 'change':", err);
+      }
+    });
+
+    /*
+    
+    // Manipulador para o evento 'change'
+    eventSource.addEventListener('change', (event) => {
+      console.log("Evento SSE recebido:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Payload SSE:", payload);
+      } catch (err) {
+        console.error("Erro ao parsear o event.data:", err);
+      }
+
+      const flag = JSON.parse(event.data);
+      useVendaStore.getState().setFlagCounter();
+      // Se necessário, atualize o estado local:
+      // setSseData(flag);
+    });
+
+    */
+
+    // Manipulador de erros
+    eventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+      // Opcional: reconectar ou tratar o erro conforme sua lógica
+    };
+
+    // Cleanup: fecha a conexão quando o componente for desmontado.
+    return () => {
+      eventSource.close();
+      console.log('SSE connection closed');
+    };
+  }, []);
 
 
   //Escopo Tabela
@@ -293,7 +343,7 @@ export default function TableProducts() {
   }
   fetchProdutos();
   }, []);*/
-
+/*
   async function notifyProdutos() {
     try {
       console.log("To em notifyProdutos 1");
@@ -319,6 +369,7 @@ export default function TableProducts() {
       setProdutos([]); 
     }
   }
+    */
 
   async function fetchProdutos() {
     try {
@@ -336,10 +387,6 @@ export default function TableProducts() {
       console.log("To em fetchProdutos 2");
       setProdutos(response); // Atualiza o estado com os dados retornados
       console.log("Response fetchProdutos:", response); // Exibe os dados no console
-      //console.log("\n\n\nFETCH Produtos TOKEN:", localStorage.getItem('token'))
-      //const data = await listarProdutos();
-      //console.log("Produtos encontrados:", data);
-      //setProdutos(data.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
       setProdutos([]); 
@@ -348,13 +395,9 @@ export default function TableProducts() {
   
   //GET
   React.useEffect(() => {
-
-  
-  notifyProdutos();
   fetchProdutos();
-  //console.log("produtosssssssss:", lp);
-  //const rows = produtos;
-  }, [setFlag]);
+  console.log("FLAG DENTRO DE USEFFECT DEPOIS FETCH: ",flagCounter);
+  }, [flagCounter]);
 
   return (
     <>

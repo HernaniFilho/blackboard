@@ -8,7 +8,7 @@ class publisher {
     }
 
     async notifyAlt(req,res,next) {
-        console.log('CLIENTES EM PUBLISHER: ', this.clients.size);
+        console.log('Chamando notifyAlt');
         const flag = true;
         this.notifyChange(flag);
     }
@@ -16,9 +16,9 @@ class publisher {
     ////////////////////////////////////////////
 
     async notifyChange(flag) {
-        const event = `event: change \n`;
+        const event = `event: change\n`;
         const data = `data: ${JSON.stringify({ flag })}\n\n`;
-        console.log(data)
+        console.log("Disparando evento SSE:", data);
         this.clients.forEach((client) => {
             client.write(event);
             client.write(data);

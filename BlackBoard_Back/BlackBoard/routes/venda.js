@@ -6,8 +6,16 @@ const vendaProxyMiddleware = new VendaProxyService(Venda);
 
 const router = express.Router();
 
-// Criar venda
-router.post('/', (req, res, next)=> vendaProxyMiddleware.addVenda(req, res, next), (req, res)=> vendaProxyMiddleware.addVendaCache(req, res));
+// Criar venda //utilizado pelas lojas
+router.post('/',
+    (req, res, next) => vendaProxyMiddleware.addVenda(req, res, next),
+    (req, res, next) => {
+        if (req.headers.nomeloja === 'Loja A' || req.headers.nomeloja === 'Loja B') {
+            notifyPublisher.notifyAlt(req, res, next);
+        }
+        next();
+    },
+    (req, res) => vendaProxyMiddleware.addVendaCache(req, res));
 
 // Listar venda 
 router.get('/', (req, res, next)=> vendaProxyMiddleware.listVenda(req, res, next), (req, res)=> vendaProxyMiddleware.updateCacheVendas(req, res));

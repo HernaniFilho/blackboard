@@ -5,6 +5,12 @@ const router = express.Router();
 const clients = new Set();
 
 router.get('/', (req, res) => {
+    // Configura os cabeçalhos CORS para permitir acesso de outras origens
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Ou defina a origem específica
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Type, Cache-Control, Connection');
+
     // Set headers for SSE
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
