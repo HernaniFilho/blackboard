@@ -10,9 +10,7 @@ const useFornecedoresStore = create((set, get) => ({
   fetchFornecedores: async () => {
     set({ loading: true, error: null });
     try {
-      const data = await httpGet(`${baseUrl}/api/fornecedores`, {
-        headers: { nomeloja: "LojaC2" },
-      });
+      const data = await httpGet(`${baseUrl}/api/fornecedores`);
       set((state) => ({
         ...state,
         fornecedores: data,

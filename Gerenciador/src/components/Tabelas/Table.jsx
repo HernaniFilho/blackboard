@@ -102,7 +102,6 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
 
     setOpenEdit(false);
   };
-  // Flyweight?
   return (
     <>
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
