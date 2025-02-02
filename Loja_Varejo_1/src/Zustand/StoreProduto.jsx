@@ -1,5 +1,5 @@
 import {create} from 'zustand'
-
+//Não esta sendo utilizado
 const useProdutoStore = create((set) =>({
     nome: "",
     preco: null,
@@ -13,3 +13,4 @@ const useProdutoStore = create((set) =>({
 }));
 
 export default useProdutoStore;
+//Não esta sendo utilizado

@@ -42,6 +42,23 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function TableProducts() {
+
+  const eventSource = new EventSource('http://localhost:3000/api/notify');
+
+  // Listen for product-updated events
+  eventSource.addEventListener('change', (event) => {
+    const flag = JSON.parse(event.data);
+    console.log("\n\nFLAG:", flag);
+    useVendaStore.getState().updateFlag(flag);
+    console.log("\n\nFLAG updated:", flag);
+  });
+
+
+  // Handle errors
+  eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+    // Optionally, reconnect or handle the error
+  };
   const [quantities, setQuantities] = React.useState({});
   const [openModal, setOpenModal] = React.useState(false); // Estado para controlar o modal
   const setNomeProduto = useVendaStore((state) => state.setNomeProduto);
@@ -49,6 +66,8 @@ export default function TableProducts() {
   const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
   const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const setFlag = useVendaStore((state) => state.setFlag);
+  const flag = useVendaStore((state) => state.flag);
 
 
   //Escopo Tabela
@@ -275,6 +294,32 @@ export default function TableProducts() {
   fetchProdutos();
   }, []);*/
 
+  async function notifyProdutos() {
+    try {
+      console.log("To em notifyProdutos 1");
+      const response = await httpGet(
+        //colocar baseurl
+        'http://localhost:3000/api/notify',
+        {
+          headers:
+            { 
+              nomeLoja: 'Loja A' 
+            }
+        }
+      ); // URL do seu backend
+      console.log("To em notifyProdutos 2");
+      setProdutos(response); // Atualiza o estado com os dados retornados
+      console.log("Response notifyProdutos:", response.event); // Exibe os dados no console
+      //console.log("\n\n\nFETCH Produtos TOKEN:", localStorage.getItem('token'))
+      //const data = await listarProdutos();
+      //console.log("Produtos encontrados:", data);
+      //setProdutos(data.data);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+      setProdutos([]); 
+    }
+  }
+
   async function fetchProdutos() {
     try {
       console.log("To em fetchProdutos 1");
@@ -303,10 +348,13 @@ export default function TableProducts() {
   
   //GET
   React.useEffect(() => {
+
+  
+  notifyProdutos();
   fetchProdutos();
   //console.log("produtosssssssss:", lp);
   //const rows = produtos;
-  }, []);
+  }, [setFlag]);
 
   return (
     <>

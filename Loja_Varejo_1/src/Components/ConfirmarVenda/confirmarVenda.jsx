@@ -93,7 +93,7 @@ async function postVenda(produtoVenda) {
   try {
     console.log("To em postVenda 1");
     console.log("produtoVenda: ", produtoVenda);
-    
+
     const response = await httpPost(
       //colocar baseurl
       'http://localhost:3000/api/vendas/', produtoVenda,
@@ -176,6 +176,10 @@ export default function ConfirmarVenda({ open, handleClose }) {
     handleClose(); // Fecha o modal após salvar a data
     
   };
+
+  React.useEffect(() => { //parametro -> Flag 
+    fetchProdutos();
+    }, []);
   
 
   return (
