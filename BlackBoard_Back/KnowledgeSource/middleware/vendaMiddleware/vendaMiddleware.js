@@ -15,7 +15,9 @@ class VendaMiddleware extends iVendaService {
             const Venda = new this.Venda(req.body);
             await Venda.save();
 
-            req.vendas = Venda
+            req.vendas = Venda;
+            const HEADER = req.headers.nomeloja;
+            console.log("HEADERS AQUI EM addVenda:", HEADER);
             return next();
         } catch (err) {
             res.status(500).json({ error: err.message });

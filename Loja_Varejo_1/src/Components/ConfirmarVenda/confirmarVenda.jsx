@@ -50,7 +50,13 @@ async function putProduto(p, id) {
     const response = await httpPut(
       //colocar baseurl
       `http://localhost:3000/api/produtos/${id}`,
-      p
+      p,
+      {
+        headers: 
+          {
+            nomeloja: "Loja A"
+          }
+      }
     ); // URL do seu backend
     console.log("To em putProduto 2");
     console.log("Response putProduto:", response); // Exibe os dados no console
@@ -78,7 +84,6 @@ async function fetchVendas() {
     ); // URL do seu backend
     console.log("To em fetchVendas 2");
     console.log("Response fetchVendas:", response); // Exibe os dados no console
-    await fetchVendas();
   } catch (error) {
     console.error("Erro ao buscar vendas:", error);
   }
@@ -88,18 +93,18 @@ async function postVenda(produtoVenda) {
   try {
     console.log("To em postVenda 1");
     console.log("produtoVenda: ", produtoVenda);
-    /*const produto = {
-      nomeLoja: 'Loja A',
-      nomeProduto: "Exemplo 3",
-      quantidade: 3,
-      data: new Date(),
-      precoTotal: 5
-    };*/
+    
     const response = await httpPost(
       //colocar baseurl
-      'http://localhost:3000/api/vendas/', produtoVenda); // URL do seu backend
+      'http://localhost:3000/api/vendas/', produtoVenda,
+      {
+        headers: 
+          {
+            nomeloja: "Loja A"
+          }
+      }); // URL do seu backend
     console.log("To em postVenda 2");
-    console.log("Response postVenda:", response); // Exibe os dados no console
+    console.log("Response postVenda:", response);
     await fetchVendas();
   } catch (error) {
     console.error("Erro ao buscar vendas:", error);
@@ -123,7 +128,7 @@ export default function ConfirmarVenda({ open, handleClose }) {
     }, 2000);
   };
 
-  const handleConfirmar = () => {
+  async function handleConfirmar() {
     // Obtendo a data e salvando no Zustand
     const dataAtual = new Date();
     setDataVenda(dataAtual); // Salva a data atual no Zustand
@@ -156,10 +161,16 @@ export default function ConfirmarVenda({ open, handleClose }) {
     }
     console.log("produtoPostVenda: ", produtoPostVenda);
 
-    fetchProdutos();
-    putProduto(produtoVendido, idProduto);
-    fetchVendas();
-    postVenda(produtoPostVenda);
+    async function posConfirmarVenda(produtoVendido, idProduto, produtoPostVenda) {
+      await fetchProdutos();
+      await putProduto(produtoVendido, idProduto);
+      await fetchVendas();
+      await postVenda(produtoPostVenda);
+    }
+
+    await posConfirmarVenda(produtoVendido, idProduto, produtoPostVenda);
+
+    
     timer();
     window.location.reload();
     handleClose(); // Fecha o modal após salvar a data

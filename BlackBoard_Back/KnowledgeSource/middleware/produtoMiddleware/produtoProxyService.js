@@ -51,7 +51,9 @@ class produtoProxyService extends iProdutoService {
     async updateProduto(req, res, next) {
         this.alterado = true;
         const nomeAlteracao = req.body.nomeProduto;
-
+        //const HEADER = req.headers.nomeloja;
+        //console.log("HEADERS AQUI EM updateProduto:", HEADER);
+        
         if(this.produtos.length !== 0){
             if((this.produtos.filter(produto=>produto.nomeProduto === nomeAlteracao)).length === 0 ){
                 res.status(401).json({nomeProduto:'Não é permitido a alteração do nome do produto.'})
@@ -78,7 +80,8 @@ class produtoProxyService extends iProdutoService {
 
     async updateDelete(req, res, next) {
         this.alterado = true;
-
+        //const HEADER = req.headers.nomeloja;
+        //console.log("HEADERS AQUI EM updateDelete:", HEADER);
         const produto = req.body;
         const index = this.produtos.findIndex(p => p.nomeProduto === produto.nomeProduto && p.nomeLoja === produto.nomeLoja);
 
@@ -91,6 +94,7 @@ class produtoProxyService extends iProdutoService {
     async addProdutoCache(req, res, next) {
         const novoProduto = req.produtos;
         const index = this.produtos.push(novoProduto);
+        console.log("addProdutoCache", req.headers);
 
         this.produtos[index] = novoProduto;
         res.status(201).json(novoProduto);
