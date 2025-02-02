@@ -83,7 +83,7 @@ export default function TableProducts() {
 
 
   /*const nomeLoja = {
-    loja: "LojaA"
+    loja: "LojaB"
   }*/
 
 
@@ -104,7 +104,7 @@ export default function TableProducts() {
           {
             headers: 
               {
-                nomeloja: "Loja A"
+                nomeloja: "Loja B"
               }
           }
         ); // URL do seu backend
@@ -125,7 +125,7 @@ export default function TableProducts() {
         preco: 0.1,
         quantidade: 3,
         estoqueMin: 5,
-        nomeLoja: 'Loja A'
+        nomeLoja: 'Loja B'
       };
       const response = await httpPost(
         //colocar baseurl
@@ -157,7 +157,7 @@ export default function TableProducts() {
         {
           headers: 
             {
-              nomeloja: "Loja A"
+              nomeloja: "Loja B"
             }
         }
       ); // URL do seu backend
@@ -179,7 +179,7 @@ export default function TableProducts() {
         preco: 0.8,
         quantidade: 8,
         estoqueMin: 5,
-        nomeLoja: 'Loja A'
+        nomeLoja: 'Loja B'
       };
       const response = await httpPut(
         //colocar baseurl
@@ -212,7 +212,7 @@ export default function TableProducts() {
         {
           headers: 
             {
-              nomeloja: "Loja A"
+              nomeloja: "Loja B"
             }
         }
       ); // URL do seu backend
@@ -257,7 +257,7 @@ export default function TableProducts() {
         preco: 5,
         quantidade: 1,
         estoqueMin: 5,
-        nomeLoja: 'Loja A'
+        nomeLoja: 'Loja B'
       };
       console.log("Teste:", produto)
       const response = await httpPut(
@@ -284,7 +284,7 @@ export default function TableProducts() {
         {
           headers:
             { 
-              nomeLoja: 'Loja A' 
+              nomeLoja: 'Loja B' 
             }
         }
       ); // URL do seu backend
@@ -310,7 +310,7 @@ export default function TableProducts() {
 
   return (
     <>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ margin: '0 16 16px', borderRadius: '10px' }}>
         <Table sx={{ minWidth: 700 }} aria-label="customized table">
           <TableHead>
             <TableRow>
@@ -341,6 +341,7 @@ export default function TableProducts() {
                 </StyledTableCell>
                 <StyledTableCell align="right">
                   <Button
+                    sx={{ backgroundColor: 'red' }}
                     variant="contained"
                     endIcon={<SendIcon />}
                     onClick={() => handleRegistrarVenda(row)}
