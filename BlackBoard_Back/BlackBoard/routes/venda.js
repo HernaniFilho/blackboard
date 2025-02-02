@@ -15,7 +15,7 @@ router.get('/', (req, res, next)=> vendaProxyMiddleware.listVenda(req, res, next
 // Atualizar venda // Não deveria ser implementado
 router.put('/:id', (req, res, next)=> vendaProxyMiddleware.updateVenda(req, res, next), (req, res)=> vendaProxyMiddleware.updateVendaCache(req, res));
 
-// Deletar venda
+//gerenciador consegue deletar 
 router.delete('/:id', (req, res, next)=> vendaProxyMiddleware.deleteVenda(req, res, next), (req, res)=> vendaProxyMiddleware.updateDelete(req, res));
 
 module.exports = router;

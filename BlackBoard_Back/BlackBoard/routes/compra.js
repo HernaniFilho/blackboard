@@ -5,11 +5,11 @@ const CompraProxyService = require('../../KnowledgeSource/middleware/compraMiddl
 const compraProxyMiddleware = new CompraProxyService(Compra);
 
 const router = express.Router();
-
+//gerenciador consegue adicionar 
 router.post('/',(req,res,next)=>compraProxyMiddleware.criaCompra(req,res,next),(req,res)=>compraProxyMiddleware.updateCompraCache(req,res));
 
 router.get('/',(req,res,next)=>compraProxyMiddleware.listCompra(req,res,next),(req,res)=>compraProxyMiddleware.updateCacheCompra(req,res));
-
+//gerenciador consegue deletar 
 router.delete('/:id',(req,res,next)=>compraProxyMiddleware.deleteCompra(req,res,next),(req,res)=>compraProxyMiddleware.updateDelete(req,res));
 
 module.exports = router;

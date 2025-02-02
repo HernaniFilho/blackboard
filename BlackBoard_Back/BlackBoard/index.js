@@ -9,6 +9,7 @@ const fornecedores = require('./routes/fornecedor');
 const produtos = require('./routes/produto');
 const tranferencias = require('./routes/transferencia');
 const vendas = require('./routes/venda');
+const notify = require('./routes/notify');
 const auth = require("./routes/auth");
 
 
@@ -37,6 +38,7 @@ const PORT = process.env.PORT || 3000; // Define the port your server will run o
 app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
 
 // Rotas
+app.use("/api/notify",notify.router);
 app.use("/api/compras", compras);
 app.use("/api/fornecedores", fornecedores);
 app.use("/api/produtos", produtos);
