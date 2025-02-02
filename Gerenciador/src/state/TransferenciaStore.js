@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { httpGet, httpPost, httpPut, httpDelete } from "../../app";
 import { baseUrl } from "../../baseurl";
 
-const useTransferenciasStore = create((set) => ({
+const useTransferenciasStore = create((set, get) => ({
   transferencias: [],
   loading: false,
   error: null,
@@ -12,7 +12,6 @@ const useTransferenciasStore = create((set) => ({
     console.log("Entrei aqui");
     try {
       const data = await httpGet(`${baseUrl}/api/transferencias`);
-      console.log("Ola", data);
       set((state) => ({
         ...state,
         transferencias: data,

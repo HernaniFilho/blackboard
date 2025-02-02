@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { httpGet } from "../../app";
+import { httpGet, httpPost } from "../../app";
 import { baseUrl } from "../../baseurl";
 
 const useComprasStore = create((set, get) => ({
@@ -26,6 +26,7 @@ const useComprasStore = create((set, get) => ({
 
   addCompras: async (compra) => {
     set({ loading: true, error: null });
+    console.log(compra);
     try {
       const newCompra = await httpPost(`${baseUrl}/api/compras`, compra);
       set((state) => ({
@@ -34,6 +35,7 @@ const useComprasStore = create((set, get) => ({
       }));
       get().fetchCompras();
     } catch (error) {
+      console.log(error);
       set({ error, loading: false });
     }
   },

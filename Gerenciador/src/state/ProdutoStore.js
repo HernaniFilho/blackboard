@@ -11,7 +11,7 @@ const useProdutosStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await httpGet(`${baseUrl}/api/produtos`, {
-        headers: { nomeloja: "Loja A" },
+        headers: { nomeloja: "z" },
       });
 
       set((state) => ({
@@ -20,6 +20,7 @@ const useProdutosStore = create((set, get) => ({
         loading: false,
       }));
     } catch (error) {
+      console.log(error);
       set((state) => ({ ...state, error, loading: false }));
     }
   },
@@ -41,9 +42,7 @@ const useProdutosStore = create((set, get) => ({
   updateProduto: async (updatedData, id) => {
     set({ loading: true, error: null });
     try {
-      console.log("data", id);
       const { __v, _id, ...dataToSend } = updatedData;
-      console.log("Data to send:", dataToSend);
       const updatedProduto = await httpPut(
         `${baseUrl}/api/produtos/${id}`,
         dataToSend
@@ -56,6 +55,7 @@ const useProdutosStore = create((set, get) => ({
       }));
       get().fetchProdutos();
     } catch (error) {
+      console.log(error);
       set({ error, loading: false });
     }
   },

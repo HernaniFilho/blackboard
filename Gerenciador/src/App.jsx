@@ -28,6 +28,8 @@ function App() {
 
   return (
     <>
+      <h1>{componentStrategies[escolha]?.name || "Dashboard"}</h1>
+
       <div className="top-left">
         <TemporaryDrawer />
       </div>
