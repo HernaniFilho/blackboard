@@ -1,8 +1,14 @@
 const express = require('express');
 const Venda = require('../models/venda');
+const Produto = require('../models/produto');
+const clientesSSE = require('../routes/notify');
+
 const VendaProxyService = require('../../KnowledgeSource/middleware/vendaMiddleware/vendaProxyService');
+const NotifyService = require('../../KnowledgeSource/middleware/notifyService/publisher');
 
 const vendaProxyMiddleware = new VendaProxyService(Venda);
+
+const notifyPublisher = new NotifyService(clientesSSE.clients,Produto);
 
 const router = express.Router();
 

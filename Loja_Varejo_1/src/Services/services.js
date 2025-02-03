@@ -2,7 +2,7 @@ import axios from "axios";
 
 const baseURL = "http://localhost:3000";
 
-export async function listarProdutos(){
+export async function listarProdutos() {
     //const token = localStorage.getItem('token');
     const response = axios.get(`${baseURL}/api/produtos`);
     return response;
@@ -17,8 +17,13 @@ export async function registrarVenda(body) {
 
     try {
         //console.log("CRIAR VENDA AQUI", body);
-        
-        const response = await axios.post(`${baseURL}/api/vendas`, body/*, {
+
+        const response = await axios.post(
+            `${baseURL}/api/vendas`,
+             body,
+            { 
+                headers:{nomeLoja:"Loja A"}
+             }/*, {
             headers: {
                 Authorization: `Bearer ${tokenCria}`
             },
@@ -30,7 +35,7 @@ export async function registrarVenda(body) {
         throw error;
     }
 
-//AtualizarProduto
+    //AtualizarProduto
 
 
 };

@@ -172,7 +172,7 @@ export default function ConfirmarVenda({ open, handleClose }) {
 
     
     timer();
-    window.location.reload();
+    window.location.reload();//Tentar mudar 
     handleClose(); // Fecha o modal após salvar a data
     
   };
