@@ -80,7 +80,6 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
   };
 
   const handleOpenEdit = (row) => {
-    console.log("Editing product:", row);
     setProductData(row);
     setOpenEdit(true);
   };
@@ -125,7 +124,7 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
               {rows
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row) => (
-                  <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row._id}>
                     {columns.map((column) => {
                       const value = row[column.id];
                       return (

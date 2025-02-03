@@ -73,7 +73,51 @@ function Dashboard() {
 
   useEffect(() => {
     fetchProdutos();
+    gerarSugestao();
   }, [fetchProdutos]);
+
+  useEffect(() => {
+    // Cria a conexão SSE somente quando o componente é montado.
+    const eventSource = new EventSource("http://localhost:3000/api/notify");
+    eventSource.onopen = (e) => {
+      console.log("SSE connection established:", e);
+    };
+
+    eventSource.onmessage = async (event) => {
+      console.log("onmessage event received:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Parsed payload (onmessage):", payload);
+        await fetchProdutos();
+        gerarSugestao();
+      } catch (err) {
+        console.error("Error parsing onmessage event.data:", err);
+      }
+    };
+
+    eventSource.addEventListener("change", async (event) => {
+      console.log("Evento SSE 'change' received:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Parsed payload in 'change':", payload);
+        await fetchProdutos();
+        gerarSugestao();
+      } catch (err) {
+        console.error("Error parsing event.data in 'change':", err);
+      }
+    });
+    // Manipulador de erros
+    eventSource.onerror = (error) => {
+      console.error("SSE error:", error);
+      // Opcional: reconectar ou tratar o erro conforme sua lógica
+    };
+
+    // Cleanup: fecha a conexão quando o componente for desmontado.
+    return () => {
+      eventSource.close();
+      console.log("SSE connection closed");
+    };
+  }, []);
 
   const handleTransferencia = async (produto) => {
     const sugestao = sugestoesMap.get(produto.nomeProduto);
@@ -86,7 +130,7 @@ function Dashboard() {
         "warning"
       );
     }
-    await delay(1000);
+    await delay(500);
     gerarSugestao();
   };
 

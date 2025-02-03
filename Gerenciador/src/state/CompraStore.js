@@ -11,7 +11,7 @@ const useComprasStore = create((set, get) => ({
     set({ loading: true, error: null });
     try {
       const data = await httpGet(`${baseUrl}/api/compras`, {
-        headers: { nomeloja: "LojaC2" },
+        headers: { nomeloja: "gen" },
       });
       set((state) => ({
         ...state,
