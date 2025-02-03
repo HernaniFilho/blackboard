@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useProdutosStore from "../state/ProdutoStore";
 import useTransferenciasStore from "../state/TransferenciaStore";
 import useComprasStore from "../state/CompraStore";
@@ -61,58 +61,51 @@ function Dashboard() {
   };
 
   const gerarSugestao = () => {
-    const produtosBaixos = produtos.filter(
+    // Access current produtos directly from the store to avoid stale closure
+    const currentProdutos = useProdutosStore.getState().produtos;
+    const produtosBaixos = currentProdutos.filter(
       (produto) => produto.quantidade <= produto.estoqueMin
     );
     setBaixo(produtosBaixos);
-
     const newSugestoesMap = verificaEstoque(produtosBaixos);
     setSugestoesMap(newSugestoesMap);
     showSnackbar("Estoque verificado", "success");
   };
 
   useEffect(() => {
-    fetchProdutos();
-    gerarSugestao();
-  }, [fetchProdutos]);
+    const initialize = async () => {
+      await fetchProdutos();
+      gerarSugestao();
+    };
+    initialize();
+  }, []);
+
+  const gerarSugestaoRef = useRef(() => {});
+  useEffect(() => {
+    gerarSugestaoRef.current = gerarSugestao;
+  }, [gerarSugestao]);
 
   useEffect(() => {
-    // Cria a conexão SSE somente quando o componente é montado.
     const eventSource = new EventSource("http://localhost:3000/api/notify");
     eventSource.onopen = (e) => {
       console.log("SSE connection established:", e);
     };
 
-    eventSource.onmessage = async (event) => {
-      console.log("onmessage event received:", event);
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("Parsed payload (onmessage):", payload);
-        await fetchProdutos();
-        gerarSugestao();
-      } catch (err) {
-        console.error("Error parsing onmessage event.data:", err);
-      }
-    };
-
     eventSource.addEventListener("change", async (event) => {
-      console.log("Evento SSE 'change' received:", event);
       try {
         const payload = JSON.parse(event.data);
         console.log("Parsed payload in 'change':", payload);
         await fetchProdutos();
-        gerarSugestao();
+        gerarSugestaoRef.current();
       } catch (err) {
         console.error("Error parsing event.data in 'change':", err);
       }
     });
-    // Manipulador de erros
+
     eventSource.onerror = (error) => {
       console.error("SSE error:", error);
-      // Opcional: reconectar ou tratar o erro conforme sua lógica
     };
 
-    // Cleanup: fecha a conexão quando o componente for desmontado.
     return () => {
       eventSource.close();
       console.log("SSE connection closed");
@@ -146,7 +139,7 @@ function Dashboard() {
     } catch (error) {
       showSnackbar("Erro inesperado ao registrar a compra", "error");
     }
-    await delay(1000);
+    await delay(500);
     gerarSugestao();
   };
 
