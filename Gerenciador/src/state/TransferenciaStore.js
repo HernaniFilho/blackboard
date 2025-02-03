@@ -9,7 +9,6 @@ const useTransferenciasStore = create((set, get) => ({
 
   fetchTransferencias: async () => {
     set({ loading: true, error: null });
-    console.log("Entrei aqui");
     try {
       const data = await httpGet(`${baseUrl}/api/transferencias`);
       set((state) => ({
@@ -18,7 +17,6 @@ const useTransferenciasStore = create((set, get) => ({
         loading: false,
       }));
     } catch (error) {
-      console.log(error);
       set((state) => ({ ...state, error, loading: false }));
     }
   },

@@ -17,7 +17,6 @@ const useFornecedoresStore = create((set, get) => ({
         loading: false,
       }));
     } catch (error) {
-      console.log("Erro:" + error);
       set((state) => ({ ...state, error, loading: false }));
     }
   },
@@ -38,7 +37,6 @@ const useFornecedoresStore = create((set, get) => ({
       }));
       get().fetchFornecedores();
     } catch (error) {
-      console.log("Error: ", error);
       set({ error, loading: false });
     }
   },

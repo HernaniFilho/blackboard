@@ -9,22 +9,8 @@ const columns = [
   { id: "data", label: "Data", minWidth: 100 },
 ];
 
-const rows = [
-  {
-    id: 1,
-    lojaSaida: "loja b",
-    lojaEntrada: "loja a",
-    nomeLoja: "B",
-    produto: [
-      { nome: "Sapatilha", nomeLoja: "Loja B", preco: 23.99, quantidade: 5 },
-    ],
-    data: "19/05/2003",
-  },
-];
-
 function Transferencia() {
-  const { transferencias, loading, error, fetchTransferencias } =
-    useTransferenciasStore();
+  const { transferencias, fetchTransferencias } = useTransferenciasStore();
   useEffect(() => {
     fetchTransferencias();
   }, [fetchTransferencias]);

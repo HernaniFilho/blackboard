@@ -19,14 +19,12 @@ const useComprasStore = create((set, get) => ({
         loading: false,
       }));
     } catch (error) {
-      console.log(error);
       set((state) => ({ ...state, error, loading: false }));
     }
   },
 
   addCompras: async (compra) => {
     set({ loading: true, error: null });
-    console.log(compra);
     try {
       const newCompra = await httpPost(`${baseUrl}/api/compras`, compra);
       set((state) => ({
@@ -35,7 +33,6 @@ const useComprasStore = create((set, get) => ({
       }));
       get().fetchCompras();
     } catch (error) {
-      console.log(error);
       set({ error, loading: false });
     }
   },

@@ -9,17 +9,14 @@ const useVendasStore = create((set) => ({
 
   fetchVendas: async () => {
     set({ loading: true, error: null });
-    console.log("Entrei aqui");
     try {
       const data = await httpGet(`${baseUrl}/api/vendas`);
-      console.log("Ola", data);
       set((state) => ({
         ...state,
         vendas: data,
         loading: false,
       }));
     } catch (error) {
-      console.log(error);
       set((state) => ({ ...state, error, loading: false }));
     }
   },

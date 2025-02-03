@@ -10,7 +10,6 @@ function useRegistraTransferencia() {
     const quantidadeTransferida = Math.round(
       (transferido.quantidade - transferido.estoqueMin) * 0.3
     );
-    console.log("Eai:", quantidadeTransferida);
     const transferencia = {
       lojaSaida: transferido.nomeLoja,
       lojaEntrada: recebido.nomeLoja,

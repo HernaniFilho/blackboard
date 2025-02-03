@@ -36,10 +36,6 @@ function useRegistraCompra() {
 
       return compra;
     } else {
-      console.warn(
-        "Fornecedor não encontrado para o produto:",
-        produto.nomeProduto
-      );
       return null;
     }
   };

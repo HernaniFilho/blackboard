@@ -59,7 +59,6 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
   const { deleteFornecedor, updateFornecedor } = useFornecedoresStore();
 
   const handleDelete = (id) => {
-    console.log(id);
     openConfirmationDialog(() => {
       if (pageType === "orders") {
         deleteProduto(id);
@@ -91,7 +90,6 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
   };
 
   const handleSaveEdit = (productData) => {
-    console.log("Updated Data:", productData.id);
     if (pageType === "orders") {
       updateProduto(productData.data, productData.id);
       showSnackbar("Esse produto foi alterado", "info");

@@ -102,7 +102,6 @@ export default function ProductModal({
   }, [productData, setValue, pageType]);
 
   const handleFormSubmit = (data) => {
-    console.log("handleFormSubmit called with data:", data);
     onSubmit({ data, id: productData._id });
     handleClose();
   };

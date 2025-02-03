@@ -67,7 +67,6 @@ function Dashboard() {
     setBaixo(produtosBaixos);
 
     const newSugestoesMap = verificaEstoque(produtosBaixos);
-    console.log(newSugestoesMap);
     setSugestoesMap(newSugestoesMap);
     showSnackbar("Estoque verificado", "success");
   };
@@ -78,8 +77,6 @@ function Dashboard() {
 
   const handleTransferencia = async (produto) => {
     const sugestao = sugestoesMap.get(produto.nomeProduto);
-    console.log("handleTransferencia:", produto);
-    console.log("handleTransferencia:", sugestao);
     if (sugestao) {
       registraTransferencia(produto, sugestao);
       showSnackbar("Transferência registrada com sucesso!", "success");
@@ -96,7 +93,6 @@ function Dashboard() {
   const handleCompra = async (produto) => {
     try {
       const comprado = await registraCompra(produto, produto.estoqueMin * 2);
-      console.log(comprado);
 
       if (comprado) {
         showSnackbar("Compra registrada com sucesso!", "success");
@@ -104,7 +100,6 @@ function Dashboard() {
         showSnackbar("Fornecedor não encontrado para este produto", "error");
       }
     } catch (error) {
-      console.error("Erro ao registrar a compra:", error);
       showSnackbar("Erro inesperado ao registrar a compra", "error");
     }
     await delay(1000);
@@ -120,7 +115,14 @@ function Dashboard() {
           padding: "16px",
         }}
       >
-        <Button variant="contained" onClick={gerarSugestao}>
+        <Button
+          variant="contained"
+          onClick={gerarSugestao}
+          style={{
+            color: theme.palette.custom.skyBlue,
+            backgroundColor: theme.palette.custom.teal,
+          }}
+        >
           Verificar Estoque Baixo
         </Button>
       </div>

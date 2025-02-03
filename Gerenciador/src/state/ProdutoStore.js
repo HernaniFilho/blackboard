@@ -20,7 +20,6 @@ const useProdutosStore = create((set, get) => ({
         loading: false,
       }));
     } catch (error) {
-      console.log(error);
       set((state) => ({ ...state, error, loading: false }));
     }
   },
@@ -28,7 +27,9 @@ const useProdutosStore = create((set, get) => ({
   addProduto: async (produto) => {
     set({ loading: true, error: null });
     try {
-      const newProduto = await httpPost(`${baseUrl}/api/produtos`, produto,{headers: { nomeloja: "gen" }});
+      const newProduto = await httpPost(`${baseUrl}/api/produtos`, produto, {
+        headers: { nomeloja: "gen" },
+      });
       set((state) => ({
         produtos: [...state.produtos, newProduto],
         loading: false,
@@ -46,7 +47,7 @@ const useProdutosStore = create((set, get) => ({
       const updatedProduto = await httpPut(
         `${baseUrl}/api/produtos/${id}`,
         dataToSend,
-        {headers: { nomeloja: "gen" }}
+        { headers: { nomeloja: "gen" } }
       );
       set((state) => ({
         produtos: state.produtos.map((produto) =>
@@ -56,7 +57,6 @@ const useProdutosStore = create((set, get) => ({
       }));
       get().fetchProdutos();
     } catch (error) {
-      console.log(error);
       set({ error, loading: false });
     }
   },
@@ -64,8 +64,9 @@ const useProdutosStore = create((set, get) => ({
   deleteProduto: async (id) => {
     set({ loading: true, error: null });
     try {
-      console.log(id);
-      await httpDelete(`${baseUrl}/api/produtos/${id}`,{headers: { nomeloja: "gen" }});
+      await httpDelete(`${baseUrl}/api/produtos/${id}`, {
+        headers: { nomeloja: "gen" },
+      });
       set((state) => ({
         produtos: state.produtos.filter((produto) => produto.id !== id),
         loading: false,

@@ -7,6 +7,7 @@ import Venda from "./components/Venda";
 import Compra from "./components/Compra";
 import Transferencia from "./components/Transferencia";
 import Dashboard from "./components/Dashboard";
+import theme from "./assets/palette";
 
 const componentStrategies = {
   1: Produto,
@@ -28,7 +29,9 @@ function App() {
 
   return (
     <>
-      <h1>{componentStrategies[escolha]?.name || "Dashboard"}</h1>
+      <h1 style={{ color: theme.palette.custom.navy }}>
+        {componentStrategies[escolha]?.name || "Dashboard"}
+      </h1>
 
       <div className="top-left">
         <TemporaryDrawer />

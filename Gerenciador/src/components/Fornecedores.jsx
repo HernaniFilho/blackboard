@@ -63,7 +63,7 @@ const schema = yup.object().shape({
 });
 
 function Fornecedores() {
-  const { fornecedores, loading, error, fetchFornecedores, addFornecedor } =
+  const { fornecedores, fetchFornecedores, addFornecedor } =
     useFornecedoresStore();
 
   const [open, setOpen] = useState(false);
@@ -89,9 +89,7 @@ function Fornecedores() {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     addFornecedor(data);
-    console.log("Fornecedor adicionado:", data);
     handleClose();
   };
 

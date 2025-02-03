@@ -115,14 +115,11 @@ function Produto() {
 
   const onSubmit = (data) => {
     addProduto(data);
-    console.log(produtos);
-    console.log("Produto adicionado:", data);
     handleClose();
   };
 
   useEffect(() => {
     fetchProdutos();
-    console.log("Produtos:", produtos);
   }, []);
 
   useEffect(() => {
