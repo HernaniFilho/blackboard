@@ -26,7 +26,7 @@ class CompraProxyService extends iCompraService {
             await this.compraMiddleware.listCompra(req, res, next);
         } else {
             console.log("VEIO DO CACHE PROXY");
-            const comprasEmLoja = this.compras.filter(compra => compra.nomeLoja === loja);
+            const comprasEmLoja = this.compras;
             res.status(200).json(comprasEmLoja);
         }
     }
