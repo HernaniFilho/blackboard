@@ -112,11 +112,12 @@ async function postVenda(produtoVenda) {
 };
 
 
-export default function ConfirmarVenda({ open, handleClose }) {
+export default function ConfirmarVenda({ open, handleClose, showSnackBar }) {
   const nomeProduto = useVendaStore((state) => state.nomeProduto);
   const quantidade = useVendaStore((state) => state.quantidade);
   const precoTotal = useVendaStore((state) => state.precoTotal);
   const setDataVenda = useVendaStore((state) => state.setData);
+  const clearStore = useVendaStore((state) => state.setClearVendaStore)
   const navigate = useNavigate();
   const timer = () => {
     setTimeout(() => {
@@ -170,10 +171,11 @@ export default function ConfirmarVenda({ open, handleClose }) {
 
     await posConfirmarVenda(produtoVendido, idProduto, produtoPostVenda);
 
-    
+    clearStore();
     timer();
     window.location.reload();
     handleClose(); // Fecha o modal após salvar a data
+    showSnackbar("Venda registrada com sucesso!");
     
   };
 

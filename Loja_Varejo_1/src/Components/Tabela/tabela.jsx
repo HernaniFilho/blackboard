@@ -51,7 +51,13 @@ export default function TableProducts() {
   const setQuantidade = useVendaStore((state) => state.setQuantidade);
   const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
   const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal);
+  const clearStore = useVendaStore((state) => state.setClearVendaStore);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const showSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
   //const setFlag = useVendaStore((state) => state.setFlag);
   const flagCounter = useVendaStore((state) => state.flagCounter);
 
@@ -134,6 +140,7 @@ export default function TableProducts() {
     const quantidade = quantities[produto._id] || 0;
 
     if (quantidade === 0) {
+      setSnackbarMessage("Por favor, selecione a quantidade antes de registrar a venda.");
       setSnackbarOpen(true); // Exibe o aviso no Snackbar
       return;
     }
@@ -395,6 +402,13 @@ export default function TableProducts() {
   
   //GET
   React.useEffect(() => {
+    if (openModal) {
+      setOpenModal(false);
+      setSnackbarMessage("Um produto sofreu alteração. Por favor, tente novamente.");
+      setSnackbarOpen(true);
+      clearStore();
+    }
+  setQuantities(0);
   fetchProdutos();
   console.log("FLAG DENTRO DE USEFFECT DEPOIS FETCH: ",flagCounter);
   }, [flagCounter]);
@@ -446,13 +460,13 @@ export default function TableProducts() {
       </TableContainer>
 
       {/* Passa o estado openModal e o método handleCloseModal para o componente ConfirmarVenda */}
-      <ConfirmarVenda open={openModal} handleClose={() => setOpenModal(false)} />
+      <ConfirmarVenda open={openModal} handleClose={() => setOpenModal(false)} showSnackbar={showSnackbar} />
          {/* Snackbar para o aviso */}
     <Snackbar
       open={snackbarOpen}
       autoHideDuration={3000}
       onClose={() => setSnackbarOpen(false)}
-      message="Por favor, selecione a quantidade antes de registrar a venda."
+      message= {snackbarMessage}
     />
   </>
 );
