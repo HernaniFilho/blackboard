@@ -14,6 +14,13 @@ const useVendaStore = create((set,get) =>({
     setPrecoTotal: (precoTotal) => set({precoTotal: precoTotal}),
     setProdutoPosVenda: (produtoPosVenda) => set({produtoPosVenda : produtoPosVenda}),
     setFlagCounter: () => set({ flagCounter: get().flagCounter + 1 }),
+    setClearVendaStore: () => set({
+        nomeProduto: null,
+        quantidade: null,
+        data: null,
+        precoTotal: null,
+        produtoPosVenda: null
+      })
 }));
 
 export default useVendaStore;
