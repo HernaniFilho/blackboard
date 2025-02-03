@@ -5,7 +5,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import { alignProperty } from '@mui/material/styles/cssUtils';
 
-export default function SelectQTD({ onChangeQuantity, maxQuantidade}) {
+export default function SelectQTD({ value, onChangeQuantity, maxQuantidade}) {
   const [qtd, setQtd] = React.useState('');
 
   const handleChange = (event) => {
@@ -40,7 +40,7 @@ export default function SelectQTD({ onChangeQuantity, maxQuantidade}) {
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
-          value={qtd}
+          value={value}
           onChange={handleChange}
           autoWidth
           label="Qtd"

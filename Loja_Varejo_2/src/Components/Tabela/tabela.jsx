@@ -42,13 +42,88 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function TableProducts() {
+
+ 
+
   const [quantities, setQuantities] = React.useState({});
   const [openModal, setOpenModal] = React.useState(false); // Estado para controlar o modal
   const setNomeProduto = useVendaStore((state) => state.setNomeProduto);
   const setQuantidade = useVendaStore((state) => state.setQuantidade);
   const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
   const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal);
+  const clearStore = useVendaStore((state) => state.setClearVendaStore);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState("");
+  const showSnackbar = (message) => {
+    setSnackbarMessage(message);
+    setSnackbarOpen(true);
+  };
+  //const setFlag = useVendaStore((state) => state.setFlag);
+  const flagCounter = useVendaStore((state) => state.flagCounter);
+
+  React.useEffect(() => {
+    // Cria a conexão SSE somente quando o componente é montado.
+    const eventSource = new EventSource('http://localhost:3000/api/notify');
+    eventSource.onopen = (e) => {
+      console.log("SSE connection established:", e);
+    };
+
+    eventSource.onmessage = (event) => {
+      console.log("onmessage event received:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Parsed payload (onmessage):", payload);
+        useVendaStore.getState().setFlagCounter();
+        console.log("flagCounter after onmessage:", useVendaStore.getState().flagCounter);
+      } catch (err) {
+        console.error("Error parsing onmessage event.data:", err);
+      }
+    };
+
+    eventSource.addEventListener('change', (event) => {
+      console.log("Evento SSE 'change' received:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Parsed payload in 'change':", payload);
+        useVendaStore.getState().setFlagCounter();
+        console.log("flagCounter after 'change':", useVendaStore.getState().flagCounter);
+      } catch (err) {
+        console.error("Error parsing event.data in 'change':", err);
+      }
+    });
+
+    /*
+    
+    // Manipulador para o evento 'change'
+    eventSource.addEventListener('change', (event) => {
+      console.log("Evento SSE recebido:", event);
+      try {
+        const payload = JSON.parse(event.data);
+        console.log("Payload SSE:", payload);
+      } catch (err) {
+        console.error("Erro ao parsear o event.data:", err);
+      }
+
+      const flag = JSON.parse(event.data);
+      useVendaStore.getState().setFlagCounter();
+      // Se necessário, atualize o estado local:
+      // setSseData(flag);
+    });
+
+    */
+
+    // Manipulador de erros
+    eventSource.onerror = (error) => {
+      console.error('SSE error:', error);
+      // Opcional: reconectar ou tratar o erro conforme sua lógica
+    };
+
+    // Cleanup: fecha a conexão quando o componente for desmontado.
+    return () => {
+      eventSource.close();
+      console.log('SSE connection closed');
+    };
+  }, []);
 
 
   //Escopo Tabela
@@ -65,6 +140,7 @@ export default function TableProducts() {
     const quantidade = quantities[produto._id] || 0;
 
     if (quantidade === 0) {
+      setSnackbarMessage("Por favor, selecione a quantidade antes de registrar a venda.");
       setSnackbarOpen(true); // Exibe o aviso no Snackbar
       return;
     }
@@ -274,6 +350,33 @@ export default function TableProducts() {
   }
   fetchProdutos();
   }, []);*/
+/*
+  async function notifyProdutos() {
+    try {
+      console.log("To em notifyProdutos 1");
+      const response = await httpGet(
+        //colocar baseurl
+        'http://localhost:3000/api/notify',
+        {
+          headers:
+            { 
+              nomeLoja: 'Loja A' 
+            }
+        }
+      ); // URL do seu backend
+      console.log("To em notifyProdutos 2");
+      setProdutos(response); // Atualiza o estado com os dados retornados
+      console.log("Response notifyProdutos:", response.event); // Exibe os dados no console
+      //console.log("\n\n\nFETCH Produtos TOKEN:", localStorage.getItem('token'))
+      //const data = await listarProdutos();
+      //console.log("Produtos encontrados:", data);
+      //setProdutos(data.data);
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+      setProdutos([]); 
+    }
+  }
+    */
 
   async function fetchProdutos() {
     try {
@@ -291,10 +394,6 @@ export default function TableProducts() {
       console.log("To em fetchProdutos 2");
       setProdutos(response); // Atualiza o estado com os dados retornados
       console.log("Response fetchProdutos:", response); // Exibe os dados no console
-      //console.log("\n\n\nFETCH Produtos TOKEN:", localStorage.getItem('token'))
-      //const data = await listarProdutos();
-      //console.log("Produtos encontrados:", data);
-      //setProdutos(data.data);
     } catch (error) {
       console.error("Erro ao buscar produtos:", error);
       setProdutos([]); 
@@ -303,10 +402,22 @@ export default function TableProducts() {
   
   //GET
   React.useEffect(() => {
+    if (openModal) {
+      setOpenModal(false);
+      setSnackbarMessage("Um produto sofreu alteração. Por favor, tente novamente.");
+      setSnackbarOpen(true);
+      clearStore();
+    }
+    setQuantities((prev) => {
+      const updatedQuantities = { ...prev };
+      produtos.forEach((produto) => {
+        updatedQuantities[produto._id] = 0; // Zera a quantidade para todos os produtos
+      });
+      return updatedQuantities;
+    });
   fetchProdutos();
-  //console.log("produtosssssssss:", lp);
-  //const rows = produtos;
-  }, []);
+  console.log("FLAG DENTRO DE USEFFECT DEPOIS FETCH: ",flagCounter);
+  }, [flagCounter]);
 
   return (
     <>
@@ -335,6 +446,7 @@ export default function TableProducts() {
                 </StyledTableCell>
                 <StyledTableCell align="right">
                   <SelectQTD
+                  value={quantities[row._id] || 0}
                     onChangeQuantity={(quantidade) => handleChangeQuantity(row._id, quantidade) }
                     maxQuantidade= {row.quantidade}
                   />
@@ -356,13 +468,13 @@ export default function TableProducts() {
       </TableContainer>
 
       {/* Passa o estado openModal e o método handleCloseModal para o componente ConfirmarVenda */}
-      <ConfirmarVenda open={openModal} handleClose={() => setOpenModal(false)} />
+      <ConfirmarVenda open={openModal} handleClose={() => setOpenModal(false)} showSnackbar={showSnackbar} />
          {/* Snackbar para o aviso */}
     <Snackbar
       open={snackbarOpen}
       autoHideDuration={3000}
       onClose={() => setSnackbarOpen(false)}
-      message="Por favor, selecione a quantidade antes de registrar a venda."
+      message= {snackbarMessage}
     />
   </>
 );

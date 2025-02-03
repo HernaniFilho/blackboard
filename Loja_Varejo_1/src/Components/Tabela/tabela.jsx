@@ -408,7 +408,13 @@ export default function TableProducts() {
       setSnackbarOpen(true);
       clearStore();
     }
-  setQuantities(0);
+    setQuantities((prev) => {
+      const updatedQuantities = { ...prev };
+      produtos.forEach((produto) => {
+        updatedQuantities[produto._id] = 0; // Zera a quantidade para todos os produtos
+      });
+      return updatedQuantities;
+    });
   fetchProdutos();
   console.log("FLAG DENTRO DE USEFFECT DEPOIS FETCH: ",flagCounter);
   }, [flagCounter]);
@@ -440,6 +446,7 @@ export default function TableProducts() {
                 </StyledTableCell>
                 <StyledTableCell align="right">
                   <SelectQTD
+                    value={quantities[row._id] || 0}
                     onChangeQuantity={(quantidade) => handleChangeQuantity(row._id, quantidade) }
                     maxQuantidade= {row.quantidade}
                   />
