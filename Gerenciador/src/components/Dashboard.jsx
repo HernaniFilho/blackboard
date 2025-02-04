@@ -1,22 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import useProdutosStore from "../state/ProdutoStore";
-import useTransferenciasStore from "../state/TransferenciaStore";
-import useComprasStore from "../state/CompraStore";
-import useFornecedoresStore from "../state/FornecedoresStore";
-import useVerificaEstoque from "../Gerenciador_Strategies/VerificaEstoque";
-import useRegistraTransferencia from "../Gerenciador_Strategies/RegistraTransferencia";
+import useVerificaEstoque from "../Gerenciador/VerificaEstoque";
+import useRegistraTransferencia from "../Gerenciador/RegistraTransferencia";
 import theme from "../assets/palette";
-import { useConfirmationDialog } from "../assets/alertDialog";
 import useSnackbar from "../assets/alert";
 import {
-  Modal,
-  Box,
-  TextField,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  Select,
-  MenuItem,
   Button,
   Table,
   Paper,
@@ -26,9 +14,12 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  FormControl,
 } from "@mui/material";
-import useRegistraCompra from "../Gerenciador_Strategies/RegistraCompra";
+import useRegistraCompra from "../Gerenciador/RegistraCompra";
+
+/**
+ * @type {Array<{id: string, label: string, minWidth: number, align: "right" | "center" | "left" | undefined}>}
+ */
 
 const columns = [
   { id: "nomeProduto", label: "Nome", minWidth: 150 },
@@ -39,6 +30,12 @@ const columns = [
   { id: "acoes", label: "Ações", minWidth: 150, align: "center" },
 ];
 
+/**
+ * Componente responsável por exibir o dashboard de gerenciamento de estoque.
+ * Ele permite verificar o estoque de produtos, sugerir transferências e registrar compras.
+ *
+ * @returns {JSX.Element} O componente do dashboard.
+ */
 function Dashboard() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -49,19 +46,36 @@ function Dashboard() {
   const [sugestoesMap, setSugestoesMap] = useState(new Map());
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   const [baixo, setBaixo] = useState([]);
+
+  /**
+   * Função para simular um atraso na execução.
+   * @param {number} ms - O tempo em milissegundos para o atraso.
+   * @returns {Promise<void>} Uma promessa que resolve após o atraso.
+   */
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+  /**
+   * Atualiza a página da tabela.
+   * @param {React.MouseEvent<HTMLButtonElement>} event - Evento de clique.
+   * @param {number} newPage - Nova página selecionada.
+   */
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  /**
+   * Atualiza o número de linhas exibidas por página na tabela.
+   * @param {React.ChangeEvent<HTMLInputElement>} event - Evento de mudança do seletor.
+   */
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
+  /**
+   * Gera sugestões de transferência de estoque com base nos produtos abaixo do estoque mínimo.
+   */
   const gerarSugestao = () => {
-    // Access current produtos directly from the store to avoid stale closure
     const currentProdutos = useProdutosStore.getState().produtos;
     const produtosBaixos = currentProdutos.filter(
       (produto) => produto.quantidade <= produto.estoqueMin
@@ -85,33 +99,35 @@ function Dashboard() {
     gerarSugestaoRef.current = gerarSugestao;
   }, [gerarSugestao]);
 
+  /**
+   * Configura a conexão com o servidor para receber notificações em tempo real (SSE).
+   */
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:3000/api/notify");
-    eventSource.onopen = (e) => {
-      console.log("SSE connection established:", e);
-    };
 
     eventSource.addEventListener("change", async (event) => {
       try {
         const payload = JSON.parse(event.data);
-        console.log("Parsed payload in 'change':", payload);
         await fetchProdutos();
         gerarSugestaoRef.current();
       } catch (err) {
-        console.error("Error parsing event.data in 'change':", err);
+        console.error("Erro ao processar evento SSE:", err);
       }
     });
 
     eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
+      console.error("Erro na conexão SSE:", error);
     };
 
     return () => {
       eventSource.close();
-      console.log("SSE connection closed");
     };
   }, []);
 
+  /**
+   * Registra a transferência de estoque para o produto selecionado.
+   * @param {Object} produto - O produto para o qual a transferência será registrada.
+   */
   const handleTransferencia = async (produto) => {
     const sugestao = sugestoesMap.get(produto.nomeProduto);
     if (sugestao) {
@@ -127,10 +143,13 @@ function Dashboard() {
     gerarSugestao();
   };
 
+  /**
+   * Registra uma nova compra para o produto selecionado.
+   * @param {Object} produto - O produto para o qual a compra será registrada.
+   */
   const handleCompra = async (produto) => {
     try {
       const comprado = await registraCompra(produto, produto.estoqueMin * 2);
-
       if (comprado) {
         showSnackbar("Compra registrada com sucesso!", "success");
       } else {
@@ -163,9 +182,10 @@ function Dashboard() {
           Verificar Estoque Baixo
         </Button>
       </div>
+
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
         <TableContainer sx={{ maxHeight: 440 }}>
-          <Table stickyHeader aria-label="sticky table">
+          <Table stickyHeader aria-label="Tabela de Estoque">
             <TableHead>
               <TableRow>
                 {columns.map((column) => (
@@ -183,9 +203,7 @@ function Dashboard() {
               {baixo
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((produto) => {
-                  const sugestao = sugestoesMap
-                    ? sugestoesMap.get(produto.nomeProduto)
-                    : null;
+                  const sugestao = sugestoesMap.get(produto.nomeProduto);
                   return (
                     <TableRow
                       hover
@@ -226,6 +244,7 @@ function Dashboard() {
             </TableBody>
           </Table>
         </TableContainer>
+
         <TablePagination
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
@@ -236,6 +255,7 @@ function Dashboard() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+
       <SnackbarComponent />
     </div>
   );

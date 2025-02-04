@@ -1,3 +1,10 @@
+/**
+ * Componente Fornecedores
+ *
+ * Este componente exibe uma tabela de fornecedores e permite adicionar novos fornecedores
+ * através de um formulário em um modal. A validação do formulário é feita com React Hook Form
+ * e Yup.
+ */
 import StickyHeadTable from "./Tabelas/Table";
 import React, { useState, useEffect } from "react";
 import AddIcon from "@mui/icons-material/Add";
@@ -19,6 +26,11 @@ import * as yup from "yup";
 import useFornecedoresStore from "../state/FornecedoresStore";
 import ErrorBoundary from "../ErrorBoundary";
 
+/**
+ * Colunas da tabela de fornecedores.
+ * @type {Array<{ id: string, label: string, minWidth: number, align: string | undefined, format: Function | undefined }>}
+ */
+
 const columns = [
   { id: "nomeFornecedor", label: "Nome do Fornecedor", minWidth: 80 },
   { id: "nomeProduto", label: "Produto", minWidth: 80 },
@@ -31,6 +43,10 @@ const columns = [
   },
 ];
 
+/**
+ * Estilos do modal.
+ * @type {object}
+ */
 const style = {
   position: "absolute",
   top: "50%",
@@ -51,7 +67,9 @@ const style = {
   gap: 2,
 };
 
-// Definição do esquema de validação com Yup
+/**
+ * Esquema de validação do formulário usando Yup.
+ */
 const schema = yup.object().shape({
   nomeFornecedor: yup.string().required("O nome do fornecedor é obrigatório"),
   nomeProduto: yup.string().required("O nome do produto é obrigatório"),
@@ -62,10 +80,15 @@ const schema = yup.object().shape({
     .required("O preço é obrigatório"),
 });
 
+/**
+ * Componente principal para gerenciar fornecedores.
+ *
+ * @component
+ * @returns {JSX.Element} O componente Fornecedores.
+ */
 function Fornecedores() {
   const { fornecedores, fetchFornecedores, addFornecedor } =
     useFornecedoresStore();
-
   const [open, setOpen] = useState(false);
 
   const {
@@ -82,12 +105,23 @@ function Fornecedores() {
     },
   });
 
+  /**
+   * Abre o modal para adicionar um novo fornecedor.
+   */
   const handleOpen = () => setOpen(true);
+
+  /**
+   * Fecha o modal e reseta o formulário.
+   */
   const handleClose = () => {
     reset();
     setOpen(false);
   };
 
+  /**
+   * Função para lidar com o envio do formulário.
+   * @param {Object} data - Dados do formulário.
+   */
   const onSubmit = (data) => {
     addFornecedor(data);
     handleClose();

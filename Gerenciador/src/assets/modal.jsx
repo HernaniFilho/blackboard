@@ -30,8 +30,11 @@ const style = {
   p: 4,
 };
 
-// 📌 Função para gerar o schema com validação condicional
-// Talvez aqui caiba o padrão strategy
+/**
+ * Gera um schema de validação Yup com base no tipo de página.
+ * @param {string} pageType - O tipo de página ("orders" ou "inventory").
+ * @returns {Object} Um schema Yup para validação de formulário.
+ */
 const getSchema = (pageType) => {
   const baseSchema = {
     nomeProduto: yup.string(),
@@ -49,7 +52,7 @@ const getSchema = (pageType) => {
       quantidade: yup
         .number()
         .typeError("A quantidade deve ser um número")
-        .min(1, "A quantidade deve ser pelo menos 1")
+        .min(0, "A quantidade deve ser positiva")
         .required("A quantidade é obrigatória"),
       estoqueMin: yup
         .number()
@@ -67,6 +70,17 @@ const getSchema = (pageType) => {
   return yup.object().shape(baseSchema);
 };
 
+/**
+ * Componente de modal para adicionar ou editar produtos ou fornecedores.
+ * @param {Object} props - As propriedades do componente.
+ * @param {boolean} props.open - Controla se o modal está aberto ou fechado.
+ * @param {Function} props.handleClose - Função para fechar o modal.
+ * @param {Function} props.onSubmit - Função chamada ao submeter o formulário.
+ * @param {Object} props.productData - Dados do produto ou fornecedor a serem editados.
+ * @param {Function} props.setProductData - Função para atualizar os dados do produto ou fornecedor.
+ * @param {string} props.pageType - O tipo de página ("orders" ou "inventory").
+ * @returns {React.Component} O componente de modal.
+ */
 export default function ProductModal({
   open,
   handleClose,
@@ -85,6 +99,9 @@ export default function ProductModal({
     resolver: yupResolver(getSchema(pageType)),
   });
 
+  /**
+   * Preenche os campos do formulário com os dados do produto ou fornecedor.
+   */
   useEffect(() => {
     if (productData) {
       if (pageType === "orders") {
@@ -101,15 +118,25 @@ export default function ProductModal({
     }
   }, [productData, setValue, pageType]);
 
+  /**
+   * Função chamada ao submeter o formulário.
+   * @param {Object} data - Os dados do formulário.
+   */
   const handleFormSubmit = (data) => {
     onSubmit({ data, id: productData._id });
     handleClose();
   };
 
+  /**
+   * Exibe os erros do formulário no console.
+   */
   useEffect(() => {
     console.log("Form errors:", errors);
   }, [errors]);
 
+  /**
+   * Reseta o formulário quando o tipo de página muda.
+   */
   useEffect(() => {
     reset();
   }, [pageType, reset]);

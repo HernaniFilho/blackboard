@@ -15,9 +15,21 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import TablePagination from "@mui/material/TablePagination";
 
+/**
+ * Componente de linha expansível para a tabela.
+ * @param {Object} props - As propriedades do componente.
+ * @param {Object} props.row - Os dados da linha.
+ * @param {Array} props.columns - As colunas da tabela.
+ * @returns {React.Component} O componente de linha expansível.
+ */
 function Row({ row, columns }) {
   const [open, setOpen] = React.useState(false);
 
+  /**
+   * Formata um valor como moeda (BRL).
+   * @param {number} value - O valor a ser formatado.
+   * @returns {string} O valor formatado como moeda.
+   */
   const formatCurrency = (value) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -61,16 +73,20 @@ function Row({ row, columns }) {
                   <TableRow>
                     <TableCell>Nome do Produto</TableCell>
                     <TableCell align="right">Quantidade</TableCell>
-                    <TableCell align="right">Preço Total</TableCell>
+                    {row.precoTotal != null && (
+                      <TableCell align="right">Preço Total</TableCell>
+                    )}
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   <TableRow>
                     <TableCell>{row.nomeProduto}</TableCell>
                     <TableCell align="right">{row.quantidade}</TableCell>
-                    <TableCell align="right">
-                      {formatCurrency(row.precoTotal)}
-                    </TableCell>
+                    {row.precoTotal != null && (
+                      <TableCell align="right">
+                        {formatCurrency(row.precoTotal)}
+                      </TableCell>
+                    )}
                   </TableRow>
                 </TableBody>
               </Table>
@@ -82,14 +98,30 @@ function Row({ row, columns }) {
   );
 }
 
+/**
+ * Componente de tabela expansível com paginação.
+ * @param {Object} props - As propriedades do componente.
+ * @param {Array} props.columns - As colunas da tabela.
+ * @param {Array} props.rows - As linhas da tabela.
+ * @returns {React.Component} O componente de tabela expansível.
+ */
 export default function CollapsibleTable({ columns, rows }) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
+  /**
+   * Altera a página atual da tabela.
+   * @param {Object} event - O evento de mudança de página.
+   * @param {number} newPage - O número da nova página.
+   */
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  /**
+   * Altera o número de linhas exibidas por página.
+   * @param {Object} event - O evento de mudança de linhas por página.
+   */
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);

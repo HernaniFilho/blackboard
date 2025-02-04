@@ -8,7 +8,8 @@
     "install-all": "concurrently \"cd BlackBoard_Back/KnowledgeSource && npm i\" \"cd BlackBoard_Back/BlackBoard && npm i\" \"cd Gerenciador && npm i\" \"cd Loja_Varejo_1 && npm i\" \"cd Loja_Varejo_2 && npm i\" ",
     "GER-BACK": "concurrently \"cd Gerenciador && npm run dev\" \"cd BlackBoard_Back/BlackBoard && npm run BACK\"",
     "LJ1-BACK": "concurrently \"cd Loja_Varejo_1 && npm run dev\" \"cd BlackBoard_Back/BlackBoard && npm run BACK\"",
-    "start": "concurrently \"cd Gerenciador && npm run dev\" \"cd Loja_Varejo_1 && npm run dev\" \"cd Loja_Varejo_2 && npm run dev\"  \"cd BlackBoard_Back/BlackBoard && npm run BACK\""
+    "start": "concurrently \"cd Gerenciador && npm run dev\" \"cd Loja_Varejo_1 && npm run dev\" \"cd Loja_Varejo_2 && npm run dev\"  \"cd BlackBoard_Back/BlackBoard && npm run BACK\"",
+    "docs": "jsdoc -c jsdoc.config.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,5 +17,10 @@
     "concurrently": "^9.1.2",
     "cors": "^2.8.5",
     "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "better-docs": "^2.7.3",
+    "jsdoc": "^4.0.4",
+    "jsdoc-tsimport-plugin": "^1.0.5"
   }
 }

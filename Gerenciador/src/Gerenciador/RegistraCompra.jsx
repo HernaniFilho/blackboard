@@ -2,14 +2,30 @@ import { useEffect } from "react";
 import useProdutosStore from "../state/ProdutoStore";
 import useComprasStore from "../state/CompraStore";
 import useFornecedoresStore from "../state/FornecedoresStore";
-
+/**
+ * Hook personalizado para registrar compras, atualizar o estoque de produtos
+ * e associar a compra ao fornecedor correspondente.
+ *
+ * @returns {Function} registraCompra - Função para registrar uma nova compra.
+ */
 function useRegistraCompra() {
   const { addCompras } = useComprasStore();
   const { fornecedores, fetchFornecedores } = useFornecedoresStore();
   const { updateProduto } = useProdutosStore();
 
+  /**
+   * Registra uma nova compra, atualiza o estoque do produto e armazena a compra.
+   *
+   * @async
+   * @param {Object} produto - O produto que está sendo comprado.
+   * @param {string} produto.nomeProduto - Nome do produto.
+   * @param {string} produto.nomeLoja - Nome da loja associada ao produto.
+   * @param {number} produto.quantidade - Quantidade atual do produto em estoque.
+   * @param {string} produto._id - ID do produto para atualização.
+   * @param {number} quantidade - Quantidade do produto a ser comprada.
+   * @returns {Object|null} Retorna o objeto da compra registrada ou null se o fornecedor não for encontrado.
+   */
   const registraCompra = async (produto, quantidade) => {
-    // Garantir que os fornecedores estejam atualizados
     await fetchFornecedores();
 
     const fornecedor = fornecedores.find(

@@ -1,3 +1,10 @@
+/**
+ * Componente React para gerenciamento de produtos.
+ * Este componente exibe uma tabela de produtos e permite adicionar novos produtos através de um modal.
+ * Utiliza validação de formulários com React Hook Form e Yup.
+ * @component
+ */
+
 import React, { useEffect, useState } from "react";
 import StickyHeadTable from "./Tabelas/Table";
 import AddIcon from "@mui/icons-material/Add";
@@ -20,6 +27,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import useProdutosStore from "../state/ProdutoStore";
 
+/**
+ * Estilo do modal de adição de produtos.
+ * @constant {Object}
+ */
 const style = {
   position: "absolute",
   top: "50%",
@@ -39,6 +50,10 @@ const style = {
   alignItems: "center",
 };
 
+/**
+ * Definição das colunas da tabela de produtos.
+ * @constant {Array<Object>}
+ */
 const columns = [
   { id: "nomeProduto", label: "Nome", minWidth: 150 },
   { id: "nomeLoja", label: "Nome Loja", minWidth: 70 },
@@ -65,6 +80,10 @@ const columns = [
   },
 ];
 
+/**
+ * Esquema de validação do formulário de produtos com Yup.
+ * @constant {yup.ObjectSchema}
+ */
 const schema = yup.object().shape({
   nomeProduto: yup.string().required("O nome do produto é obrigatório"),
   preco: yup
@@ -76,7 +95,7 @@ const schema = yup.object().shape({
   quantidade: yup
     .number()
     .typeError("A quantidade deve ser um número")
-    .positive("A quantidade deve ser maior que zero")
+    .min(0, "A quantidade deve ser maior que zero")
     .integer("A quantidade deve ser um número inteiro")
     .required("A quantidade é obrigatória"),
   estoqueMin: yup
@@ -87,6 +106,10 @@ const schema = yup.object().shape({
     .required("O estoque mínimo é obrigatório"),
 });
 
+/**
+ * Componente principal para exibição e adição de produtos.
+ * @component
+ */
 function Produto() {
   const [open, setOpen] = useState(false);
   const { produtos, fetchProdutos, addProduto } = useProdutosStore();
@@ -107,99 +130,82 @@ function Produto() {
     },
   });
 
+  /**
+   * Abre o modal de adição de produto.
+   */
   const handleOpen = () => setOpen(true);
+
+  /**
+   * Fecha o modal e reseta o formulário.
+   */
   const handleClose = () => {
     reset();
     setOpen(false);
   };
 
+  /**
+   * Manipula o envio do formulário de adição de produto.
+   * @param {Object} data - Dados do formulário.
+   */
   const onSubmit = (data) => {
     addProduto(data);
     handleClose();
   };
 
+  /**
+   * Busca os produtos ao carregar o componente.
+   */
   useEffect(() => {
     fetchProdutos();
   }, []);
 
+  /**
+   * Configura o EventSource para receber notificações em tempo real.
+   */
   useEffect(() => {
-    // Cria a conexão SSE somente quando o componente é montado.
     const eventSource = new EventSource("http://localhost:3000/api/notify");
-    eventSource.onopen = (e) => {
-      console.log("SSE connection established:", e);
-    };
 
     eventSource.onmessage = (event) => {
-      console.log("onmessage event received:", event);
       try {
         const payload = JSON.parse(event.data);
-        console.log("Parsed payload (onmessage):", payload);
         fetchProdutos();
       } catch (err) {
-        console.error("Error parsing onmessage event.data:", err);
+        console.error("Erro ao processar evento SSE:", err);
       }
     };
 
-    eventSource.addEventListener("change", (event) => {
-      console.log("Evento SSE 'change' received:", event);
-      try {
-        const payload = JSON.parse(event.data);
-        console.log("Parsed payload in 'change':", payload);
-        fetchProdutos();
-      } catch (err) {
-        console.error("Error parsing event.data in 'change':", err);
-      }
-    });
-    // Manipulador de erros
     eventSource.onerror = (error) => {
-      console.error("SSE error:", error);
-      // Opcional: reconectar ou tratar o erro conforme sua lógica
+      console.error("Erro SSE:", error);
     };
 
-    // Cleanup: fecha a conexão quando o componente for desmontado.
     return () => {
       eventSource.close();
-      console.log("SSE connection closed");
     };
   }, []);
 
   return (
     <>
-      <div>
-        <StickyHeadTable columns={columns} rows={produtos} pageType="orders" />
-      </div>
-      <div style={{ padding: "16px" }}>
-        <Fab
-          sx={{
-            color: theme.palette.custom.navy,
-            "&:hover": {
-              backgroundColor: theme.palette.custom.teal,
-            },
-          }}
-          aria-label="add"
-          onClick={handleOpen}
-        >
-          <AddIcon />
-        </Fab>
-      </div>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="child-modal-title"
-        aria-describedby="child-modal-description"
+      {/* Tabela de produtos */}
+      <StickyHeadTable columns={columns} rows={produtos} pageType="orders" />
+
+      {/* Botão flutuante para abrir o modal de adição de produto */}
+      <Fab
+        sx={{
+          color: theme.palette.custom.navy,
+          "&:hover": { backgroundColor: theme.palette.custom.teal },
+        }}
+        aria-label="add"
+        onClick={handleOpen}
       >
+        <AddIcon />
+      </Fab>
+
+      {/* Modal de adição de produto */}
+      <Modal open={open} onClose={handleClose}>
         <Box sx={style}>
-          <h2
-            id="child-modal-title"
-            style={{ textAlign: "center", marginBottom: "16px" }}
-          >
-            Adicionar novo Produto
-          </h2>
-          <form
-            style={{ width: "100%" }}
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-          >
+          <h2>Adicionar novo Produto</h2>
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
+            {/* Campo: Nome do Produto */}
             <Controller
               name="nomeProduto"
               control={control}
@@ -211,104 +217,31 @@ function Produto() {
                   variant="outlined"
                   error={!!errors.nomeProduto}
                   helperText={errors.nomeProduto?.message}
-                  sx={{ mt: 2 }}
                 />
               )}
             />
 
-            <Box sx={{ display: "flex", gap: 3, width: "100%", mt: 2 }}>
-              <Controller
-                name="preco"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <InputLabel htmlFor="outlined-adornment-amount">
-                      Preço
-                    </InputLabel>
-                    <OutlinedInput
-                      {...field}
-                      startAdornment={
-                        <InputAdornment position="start">R$</InputAdornment>
-                      }
-                      label="Preço"
-                      error={!!errors.preco}
-                    />
-                    <span style={{ color: "red", fontSize: "12px" }}>
-                      {errors.preco?.message}
-                    </span>
-                  </FormControl>
-                )}
-              />
-
-              <Controller
-                name="nomeLoja"
-                control={control}
-                render={({ field }) => (
-                  <FormControl fullWidth>
-                    <InputLabel>Loja</InputLabel>
-                    <Select {...field} error={!!errors.nomeLoja}>
-                      <MenuItem value="Loja A">Loja A</MenuItem>
-                      <MenuItem value="Loja B">Loja B</MenuItem>
-                    </Select>
-                    <span style={{ color: "red", fontSize: "12px" }}>
-                      {errors.nomeLoja?.message}
-                    </span>
-                  </FormControl>
-                )}
-              />
-            </Box>
-
-            <Box sx={{ display: "flex", gap: 3, width: "100%", mt: 2 }}>
-              <Controller
-                name="quantidade"
-                control={control}
-                render={({ field }) => (
-                  <TextField
+            {/* Campo: Preço */}
+            <Controller
+              name="preco"
+              control={control}
+              render={({ field }) => (
+                <FormControl fullWidth>
+                  <InputLabel>Preço</InputLabel>
+                  <OutlinedInput
                     {...field}
-                    fullWidth
-                    label="Quantidade"
-                    type="number"
-                    variant="outlined"
-                    error={!!errors.quantidade}
-                    helperText={errors.quantidade?.message}
+                    startAdornment={
+                      <InputAdornment position="start">R$</InputAdornment>
+                    }
+                    label="Preço"
+                    error={!!errors.preco}
                   />
-                )}
-              />
-              <Controller
-                name="estoqueMin"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    fullWidth
-                    label="Estoque Mínimo"
-                    type="number"
-                    variant="outlined"
-                    error={!!errors.estoqueMin}
-                    helperText={errors.estoqueMin?.message}
-                  />
-                )}
-              />
-            </Box>
+                </FormControl>
+              )}
+            />
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                width: "100%",
-                mt: 3,
-              }}
-            >
-              <Button
-                sx={{ color: theme.palette.custom.navy }}
-                onClick={handleClose}
-              >
-                Fechar
-              </Button>
-              <Button sx={{ color: theme.palette.custom.green }} type="submit">
-                Adicionar
-              </Button>
-            </Box>
+            {/* Botão de envio do formulário */}
+            <Button type="submit">Adicionar</Button>
           </form>
         </Box>
       </Modal>

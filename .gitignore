@@ -3,6 +3,7 @@
 /node_modules
 /build
 BlackBoard_Back/node_modules
+docs
 
 # Logs
 logs

@@ -3,14 +3,6 @@ import theme from "../../assets/palette";
 import { useConfirmationDialog } from "../../assets/alertDialog";
 import useSnackbar from "../../assets/alert";
 import {
-  Modal,
-  Box,
-  TextField,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  Select,
-  MenuItem,
   Button,
   Table,
   Paper,
@@ -20,33 +12,19 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  FormControl,
 } from "@mui/material";
 import EditProductModal from "../../assets/modal";
 import useProdutosStore from "../../state/ProdutoStore";
 import useFornecedoresStore from "../../state/FornecedoresStore";
 
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: "80%",
-  maxWidth: "600px",
-  height: "45%",
-  bgcolor: theme.palette.custom.skyBlue,
-  border: "2px solid #C8D9E6",
-  borderRadius: "16px",
-  boxShadow: 24,
-  pt: 2,
-  px: 4,
-  pb: 3,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  gap: 2,
-};
-
+/**
+ * Componente de tabela com cabeçalho fixo e funcionalidades de paginação, edição e exclusão.
+ * @param {Object} props - Props do componente.
+ * @param {Array} props.columns - Colunas da tabela.
+ * @param {Array} props.rows - Linhas de dados da tabela.
+ * @param {string} props.pageType - Tipo de página ('orders' ou 'inventory').
+ * @returns {JSX.Element} Componente React para renderizar a tabela.
+ */
 export default function StickyHeadTable({ columns, rows, pageType }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -58,6 +36,10 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
   const { deleteProduto, updateProduto } = useProdutosStore();
   const { deleteFornecedor, updateFornecedor } = useFornecedoresStore();
 
+  /**
+   * Manipula a exclusão de um item.
+   * @param {string} id - ID do item a ser deletado.
+   */
   const handleDelete = (id) => {
     openConfirmationDialog(() => {
       if (pageType === "orders") {
@@ -70,24 +52,44 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
     });
   };
 
+  /**
+   * Manipula a mudança de página na paginação da tabela.
+   * @param {Event} event - Evento de mudança de página.
+   * @param {number} newPage - Nova página selecionada.
+   */
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  /**
+   * Manipula a mudança de quantidade de linhas por página.
+   * @param {Event} event - Evento de mudança de quantidade de linhas por página.
+   */
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
+  /**
+   * Abre o modal de edição com os dados do produto/fornecedor selecionado.
+   * @param {Object} row - Dados da linha selecionada.
+   */
   const handleOpenEdit = (row) => {
     setProductData(row);
     setOpenEdit(true);
   };
 
+  /**
+   * Fecha o modal de edição.
+   */
   const handleCloseEdit = () => {
     setOpenEdit(false);
   };
 
+  /**
+   * Salva as alterações feitas no modal de edição.
+   * @param {Object} productData - Dados atualizados do produto/fornecedor.
+   */
   const handleSaveEdit = (productData) => {
     if (pageType === "orders") {
       updateProduto(productData.data, productData.id);
@@ -99,6 +101,7 @@ export default function StickyHeadTable({ columns, rows, pageType }) {
 
     setOpenEdit(false);
   };
+
   return (
     <>
       <Paper sx={{ width: "100%", overflow: "hidden" }}>
