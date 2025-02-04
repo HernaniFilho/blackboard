@@ -40,52 +40,114 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+
+/**
+ * Componente `TableProducts` que exibe uma tabela de produtos disponíveis para venda.
+ * 
+ * Este componente inclui informações sobre cada produto, como nome, estoque, preço e permite
+ * que o usuário selecione a quantidade desejada para a venda. Ao selecionar a quantidade, o
+ * botão de "Registrar Venda" fica disponível para confirmar a venda e registrar a transação.
+ * 
+ * @returns {JSX.Element} - A tabela de produtos com a funcionalidade de registrar vendas.
+ */
 export default function TableProducts() {
 
-  const [quantities, setQuantities] = React.useState({});
-  const [openModal, setOpenModal] = React.useState(false); // Estado para controlar o modal
-  const setNomeProduto = useVendaStore((state) => state.setNomeProduto);
-  const setQuantidade = useVendaStore((state) => state.setQuantidade);
-  const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda);
-  const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal);
-  const clearStore = useVendaStore((state) => state.setClearVendaStore);
-  const [snackbarOpen, setSnackbarOpen] = React.useState(false);
-  const [snackbarMessage, setSnackbarMessage] = React.useState("");
-  const flagCounter = useVendaStore((state) => state.flagCounter);
+  const [quantities, setQuantities] = React.useState({}); // Armazena as quantidades selecionadas por produto.
+  const [openModal, setOpenModal] = React.useState(false); // Estado para controlar a abertura do modal de confirmação.
+  const setNomeProduto = useVendaStore((state) => state.setNomeProduto); // Atribui o nome do produto na loja.
+  const setQuantidade = useVendaStore((state) => state.setQuantidade); // Atribui a quantidade de produtos.
+  const setProdutoPosVenda = useVendaStore((state) => state.setProdutoPosVenda); // Armazena o produto a ser vendido.
+  const setPrecoTotal = useVendaStore((state) => state.setPrecoTotal); // Armazena o preço total da venda.
+  const clearStore = useVendaStore((state) => state.setClearVendaStore); // Limpa o estado do Zustand após a venda.
+  const [snackbarOpen, setSnackbarOpen] = React.useState(false); // Controle do estado do Snackbar de erro.
+  const [snackbarMessage, setSnackbarMessage] = React.useState(""); // Armazena a mensagem do Snackbar.
+  const flagCounter = useVendaStore((state) => state.flagCounter); // Flag para controle de alterações de produto.
 
-  React.useEffect(() => {
-    // Cria a conexão SSE somente quando o componente é montado.
-    const eventSource = new EventSource('http://localhost:3000/api/notify');
+  /**
+ * Efeito colateral que lida com a conexão SSE (Server-Sent Events) para receber notificações em tempo real.
+ * O evento SSE é usado para monitorar mudanças no servidor e atualizar o estado local.
+ * 
+ * - Quando a conexão é estabelecida, uma mensagem de log é exibida.
+ * - Ao receber uma mensagem (onmessage), o payload é analisado e o estado `flagCounter` é atualizado no store.
+ * - Quando o evento `change` é recebido, a mesma lógica é executada para atualizar o `flagCounter`.
+ * - Em caso de erro ao processar a mensagem, uma mensagem de erro é registrada no console.
+ * 
+ * @effect
+ */
+React.useEffect(() => {
+  // Cria a conexão SSE somente quando o componente é montado.
+  const eventSource = new EventSource('http://localhost:3000/api/notify');
 
-    eventSource.onmessage = (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        useVendaStore.getState().setFlagCounter();
-      } catch (err) {
-        console.error("Error parsing onmessage event.data:", err);
-      }
-    };
+  /**
+   * Callback executado quando a conexão SSE é estabelecida com sucesso.
+   * Exibe uma mensagem no console de log.
+   *
+   * @param {Event} e - O evento que contém informações sobre a conexão.
+   */
+  eventSource.onopen = (e) => {
+    console.log("SSE connection established:", e);
+  };
 
-    eventSource.addEventListener('change', (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        useVendaStore.getState().setFlagCounter();
-      } catch (err) {
-        console.error("Error parsing event.data in 'change':", err);
-      }
-    });
+  /**
+   * Callback executado quando uma mensagem é recebida do servidor via SSE.
+   * A mensagem é analisada e o estado `flagCounter` do store é atualizado.
+   *
+   * @param {MessageEvent} event - O evento que contém os dados da mensagem recebida.
+   */
+  eventSource.onmessage = (event) => {
+    console.log("onmessage event received:", event);
+    try {
+      const payload = JSON.parse(event.data);
+      console.log("Parsed payload (onmessage):", payload);
+      useVendaStore.getState().setFlagCounter();
+      console.log("flagCounter after onmessage:", useVendaStore.getState().flagCounter);
+    } catch (err) {
+      console.error("Error parsing onmessage event.data:", err);
+    }
+  };
 
-    eventSource.onerror = (error) => {
-      console.error('SSE error:', error);
-    };
+  /**
+   * Callback executado quando um evento 'change' é recebido do servidor via SSE.
+   * A lógica de atualização do estado `flagCounter` é a mesma que o evento onmessage.
+   *
+   * @param {MessageEvent} event - O evento que contém os dados da mensagem recebida.
+   */
+  eventSource.addEventListener('change', (event) => {
+    console.log("Evento SSE 'change' received:", event);
+    try {
+      const payload = JSON.parse(event.data);
+      console.log("Parsed payload in 'change':", payload);
+      useVendaStore.getState().setFlagCounter();
+      console.log("flagCounter after 'change':", useVendaStore.getState().flagCounter);
+    } catch (err) {
+      console.error("Error parsing event.data in 'change':", err);
+    }
+  });
 
-    return () => {
-      eventSource.close();
-    };
-  }, []);
+  /**
+   * Callback executado em caso de erro na conexão SSE.
+   * Exibe uma mensagem de erro no console.
+   *
+   * @param {Event} error - O evento de erro que contém detalhes sobre a falha.
+   */
+  eventSource.onerror = (error) => {
+    console.error('SSE error:', error);
+  };
 
-  const [produtos, setProdutos] = React.useState([]);
-  
+  // Fecha a conexão SSE quando o componente for desmontado.
+  return () => {
+    eventSource.close();
+  };
+}, []);
+
+  const [produtos, setProdutos] = React.useState([]); // Armazena a lista de produtos.
+
+  /**
+   * Função para atualizar a quantidade selecionada para um produto específico.
+   * 
+   * @param {string} produtoId - O ID do produto.
+   * @param {number} quantidade - A quantidade selecionada.
+   */
   const handleChangeQuantity = (produtoId, quantidade) => {
     setQuantities((prev) => ({
       ...prev,
@@ -93,6 +155,12 @@ export default function TableProducts() {
     }));
   };
 
+  /**
+   * Função chamada para registrar a venda de um produto. Se a quantidade não for selecionada,
+   * exibe uma mensagem de erro usando o Snackbar.
+   * 
+   * @param {Object} produto - O produto a ser vendido.
+   */
   const handleRegistrarVenda = (produto) => {
     const quantidade = quantities[produto._id] || 0;
 
@@ -110,6 +178,9 @@ export default function TableProducts() {
     setOpenModal(true);
   };
 
+  /**
+   * Função que busca os produtos da API e atualiza o estado com a lista de produtos.
+   */
   async function fetchProdutos() {
     try {
       const response = await httpGet(
@@ -127,7 +198,8 @@ export default function TableProducts() {
       setProdutos([]); 
     }
   }
-  
+
+  // Efeito para buscar os produtos e limpar os estados sempre que o `flagCounter` for alterado.
   React.useEffect(() => {
     if (openModal) {
       setOpenModal(false);
@@ -142,7 +214,7 @@ export default function TableProducts() {
       });
       return updatedQuantities;
     });
-  fetchProdutos();
+    fetchProdutos();
   }, [flagCounter]);
 
   return (
@@ -172,7 +244,7 @@ export default function TableProducts() {
                 </StyledTableCell>
                 <StyledTableCell align="right">
                   <SelectQTD
-                  value={quantities[row._id] || 0}
+                    value={quantities[row._id] || 0}
                     onChangeQuantity={(quantidade) => handleChangeQuantity(row._id, quantidade) }
                     maxQuantidade= {row.quantidade}
                   />

@@ -4,9 +4,33 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-export default function SelectQTD({ value, onChangeQuantity, maxQuantidade}) {
+/**
+ * Componente para selecionar a quantidade de um produto.
+ * Exibe um menu de seleção onde o usuário pode escolher a quantidade de um produto para o registro de venda.
+ *
+ * @param {Object} props - Propriedades passadas para o componente.
+ * @param {number} props.value - Valor atual da quantidade selecionada.
+ * @param {Function} props.onChangeQuantity - Função chamada ao selecionar uma quantidade, passando o valor selecionado.
+ * @param {number} props.maxQuantidade - Quantidade máxima disponível para seleção.
+ * 
+ * @componente
+ * 
+ * @exemplo
+ * <SelectQTD
+ *   value={quantidadeSelecionada}
+ *   onChangeQuantity={handleQuantidadeChange}
+ *   maxQuantidade={10}
+ * />
+ */
+export default function SelectQTD({ value, onChangeQuantity, maxQuantidade }) {
   const [qtd, setQtd] = React.useState(value || "");
 
+  /**
+   * Função chamada quando a quantidade é alterada.
+   * Atualiza o estado local e chama a função onChangeQuantity para propagar a alteração.
+   * 
+   * @param {object} event - Evento do tipo onChange.
+   */
   const handleChange = (event) => {
     const selectedQtd = event.target.value;
     setQtd(selectedQtd);
@@ -15,7 +39,10 @@ export default function SelectQTD({ value, onChangeQuantity, maxQuantidade}) {
     }
   };
 
+  // Limita a quantidade máxima para no máximo 10
   const limiteMaximo = Math.min(10, maxQuantidade);
+  
+  // Cria os itens do menu com base no limite de quantidade disponível no estoque
   const menuItems = Array.from({ length: limiteMaximo }, (_, index) => (
     <MenuItem key={index + 1} value={index + 1}>
       {index + 1}

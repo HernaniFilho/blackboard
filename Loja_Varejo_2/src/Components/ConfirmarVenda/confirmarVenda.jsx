@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography';
 import useVendaStore from '../../Zustand/zustand';
 import { httpPost, httpGet, httpPut } from '../../../app';
 
+// Componente estilizado que modifica o comportamento visual do Dialog, utilizando MUI.
+// Modifica o padding de conteúdo e ações dentro do Dialog.
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
@@ -20,7 +22,14 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-
+/**
+ * Função assíncrona para buscar os produtos da loja.
+ * Realiza uma requisição GET à API de produtos, passando o cabeçalho 'nomeloja' com valor 'Loja B'.
+ * 
+ * @async
+ * @function fetchProdutos
+ * @returns {Promise<void>} Retorna uma promise que resolve após a requisição.
+ */
 async function fetchProdutos() {
   try {
     const response = await httpGet(
@@ -37,6 +46,16 @@ async function fetchProdutos() {
   }
 };
 
+/**
+ * Função assíncrona para atualizar um produto no estoque.
+ * Realiza uma requisição PUT à API de produtos, atualizando a quantidade e outras informações do produto.
+ * 
+ * @async
+ * @function putProduto
+ * @param {Object} p - Objeto contendo os dados do produto atualizado.
+ * @param {string} id - ID do produto a ser atualizado.
+ * @returns {Promise<void>} Retorna uma promise que resolve após a atualização do produto.
+ */
 async function putProduto(p, id) {
   try {
     const response = await httpPut(
@@ -55,6 +74,14 @@ async function putProduto(p, id) {
   }
 };
 
+/**
+ * Função assíncrona para buscar as vendas registradas.
+ * Realiza uma requisição GET à API de vendas, passando o cabeçalho 'nomeloja' com valor 'Loja B'.
+ * 
+ * @async
+ * @function fetchVendas
+ * @returns {Promise<void>} Retorna uma promise que resolve após a requisição.
+ */
 async function fetchVendas() {
   try {
     const response = await httpGet(
@@ -71,6 +98,15 @@ async function fetchVendas() {
   }
 };
 
+/**
+ * Função assíncrona para registrar uma nova venda.
+ * Realiza uma requisição POST à API de vendas, enviando os dados da venda.
+ * 
+ * @async
+ * @function postVenda
+ * @param {Object} produtoVenda - Objeto contendo os dados da venda.
+ * @returns {Promise<void>} Retorna uma promise que resolve após a criação da venda.
+ */
 async function postVenda(produtoVenda) {
   try {
     const response = await httpPost(
@@ -87,6 +123,15 @@ async function postVenda(produtoVenda) {
   }
 };
 
+/**
+ * Componente `ConfirmarVenda` que exibe um modal para confirmar a venda de um produto.
+ * Este componente recebe as informações do produto a ser vendido e permite ao usuário confirmar ou cancelar a venda.
+ * 
+ * @param {Object} props - Propriedades do componente.
+ * @param {boolean} props.open - Estado para controlar a visibilidade do modal.
+ * @param {function} props.handleClose - Função para fechar o modal.
+ * @returns {JSX.Element} - O JSX do modal de confirmação de venda.
+ */
 export default function ConfirmarVenda({ open, handleClose}) {
   const nomeProduto = useVendaStore((state) => state.nomeProduto);
   const quantidade = useVendaStore((state) => state.quantidade);
@@ -94,6 +139,14 @@ export default function ConfirmarVenda({ open, handleClose}) {
   const setDataVenda = useVendaStore((state) => state.setData);
   const clearStore = useVendaStore((state) => state.setClearVendaStore)
 
+  /**
+   * Função que é chamada quando o usuário confirma a venda.
+   * Atualiza o estoque, registra a venda e limpa o estado da venda.
+   * 
+   * @async
+   * @function handleConfirmar
+   * @returns {Promise<void>} Retorna uma promise que resolve após a confirmação da venda.
+   */
   async function handleConfirmar() {
     const dataAtual = new Date();
     setDataVenda(dataAtual);
@@ -115,6 +168,17 @@ export default function ConfirmarVenda({ open, handleClose}) {
       precoTotal: precoTotal      
     };
 
+    /**
+     * Função auxiliar chamada após a confirmação da venda. 
+     * Atualiza o estoque, registra a venda e realiza outras operações necessárias.
+     * 
+     * @async
+     * @function posConfirmarVenda
+     * @param {Object} produtoVendido - Dados do produto que foi vendido.
+     * @param {string} idProduto - ID do produto a ser atualizado.
+     * @param {Object} produtoPostVenda - Dados da venda a ser registrada.
+     * @returns {Promise<void>} Retorna uma promise que resolve após todas as operações de pós-venda.
+     */
     async function posConfirmarVenda(produtoVendido, idProduto, produtoPostVenda) {
       await fetchProdutos();
       await putProduto(produtoVendido, idProduto);
@@ -129,6 +193,7 @@ export default function ConfirmarVenda({ open, handleClose}) {
     handleClose();
   };
 
+  // Chama a função para buscar os produtos quando o componente é montado.
   React.useEffect(() => {
     fetchProdutos();
     }, []);

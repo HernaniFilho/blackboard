@@ -1,6 +1,12 @@
 import * as React from 'react';
 import { AppBar, Box, Toolbar, Typography, IconButton } from '@mui/material';
 
+/**
+ * Componente `ButtonAppBar` que renderiza a barra de navegação da aplicação.
+ * A barra de navegação exibe o nome da loja e possui uma estilização personalizada com MUI.
+ * 
+ * @returns {JSX.Element} - O JSX para a barra de navegação.
+ */
 export default function ButtonAppBar() {
   return (
     <Box sx={{ flexGrow: 1 }}>
