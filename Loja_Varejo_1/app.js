@@ -26,18 +26,6 @@ export const httpGet = async function (endpoint, customConfig = {}) {
     return client(endpoint, { ...customConfig, method: "GET" });
 };
 
-/*export const httpGet = async function (endpoint, body, customConfig = {}) {
-    return client(endpoint, { body, ...customConfig, method: "GET" });
-};*/
-
-/*export const httpGet = async function (endpoint, body = {}, customConfig = {}) {
-    return client(endpoint, {
-        ...customConfig,
-        method: "GET",
-        data: body, // Força o envio do body
-    });
-};*/
-
 export const httpPost = async function (endpoint, body, customConfig = {}) {
     return client(endpoint, { body, ...customConfig, method: "POST" });
 };

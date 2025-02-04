@@ -10,8 +10,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import Typography from '@mui/material/Typography';
 import useVendaStore from '../../Zustand/zustand';
 import { httpPost, httpGet, httpPut } from '../../../app';
-import { useNavigate } from "react-router-dom";
 
+/**
+ * Componente de diálogo estilizado com preenchimento personalizado para conteúdo e ações.
+ * 
+ * @componente
+ * @exemplo
+ * return <BootstrapDialog {...props} />;
+ */
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   '& .MuiDialogContent-root': {
     padding: theme.spacing(2),
@@ -21,12 +27,15 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-
+/**
+ * Busca a lista de produtos na API.
+ * 
+ * @async
+ * @returns {Promise<void>} Uma promessa indicando a conclusão da operação de busca.
+ */
 async function fetchProdutos() {
   try {
-    console.log("To em fetchProdutos 1");
     const response = await httpGet(
-      //colocar baseurl
       'http://localhost:3000/api/produtos',
       {
         headers: 
@@ -34,21 +43,23 @@ async function fetchProdutos() {
             nomeloja: "Loja A"
           }
       }
-    ); // URL do seu backend
-    console.log("To em fetchProdutos 2");
-    //setProdutos(response); // Atualiza o estado com os dados retornados
-    console.log("Response fetchProdutos:", response); // Exibe os dados no console
+    );
   } catch (error) {
     console.error("Erro ao buscar produtos:", error);
-    //setProdutos([]); 
   }
 };
 
+/**
+ * Atualiza as informações de um produto na base de dados.
+ * 
+ * @async
+ * @param {Object} p - Os dados atualizados do produto.
+ * @param {string} id - O ID do produto a ser atualizado.
+ * @returns {Promise<void>} Uma promessa indicando a conclusão da operação de atualização.
+ */
 async function putProduto(p, id) {
   try {
-    console.log("To em putProduto 1");
     const response = await httpPut(
-      //colocar baseurl
       `http://localhost:3000/api/produtos/${id}`,
       p,
       {
@@ -57,23 +68,22 @@ async function putProduto(p, id) {
             nomeloja: "Loja A"
           }
       }
-    ); // URL do seu backend
-    console.log("To em putProduto 2");
-    console.log("Response putProduto:", response); // Exibe os dados no console
+    );
     await fetchProdutos();
   } catch (error) {
     console.error("Erro ao buscar produtos:", error);
   }
 };
 
-
-
-//Popula a cache
+/**
+ * Busca os dados de vendas na API.
+ * 
+ * @async
+ * @returns {Promise<void>} Uma promessa indicando a conclusão da operação de busca.
+ */
 async function fetchVendas() {
   try {
-    console.log("To em fetchVendas 1");
     const response = await httpGet(
-      //colocar baseurl
       'http://localhost:3000/api/vendas',
       {
         headers: 
@@ -81,64 +91,65 @@ async function fetchVendas() {
             nomeloja: "Loja A"
           }
       }
-    ); // URL do seu backend
-    console.log("To em fetchVendas 2");
-    console.log("Response fetchVendas:", response); // Exibe os dados no console
+    ); 
   } catch (error) {
     console.error("Erro ao buscar vendas:", error);
   }
 };
 
+/**
+ * Envia os dados de uma venda para a API.
+ * 
+ * @async
+ * @param {Object} produtoVenda - Os dados da venda a serem enviados.
+ * @returns {Promise<void>} Uma promessa indicando a conclusão da operação de envio.
+ */
 async function postVenda(produtoVenda) {
   try {
-    console.log("To em postVenda 1");
-    console.log("produtoVenda: ", produtoVenda);
-
     const response = await httpPost(
-      //colocar baseurl
       'http://localhost:3000/api/vendas/', produtoVenda,
       {
         headers: 
           {
             nomeloja: "Loja A"
           }
-      }); // URL do seu backend
-    console.log("To em postVenda 2");
-    console.log("Response postVenda:", response);
+      });
     await fetchVendas();
   } catch (error) {
     console.error("Erro ao buscar vendas:", error);
   }
 };
 
-
-export default function ConfirmarVenda({ open, handleClose, showSnackBar }) {
+/**
+ * Componente de diálogo de confirmação de venda.
+ * 
+ * Este componente exibe um diálogo onde o usuário pode confirmar os detalhes da venda antes de finalizar a transação.
+ * 
+ * @componente
+ * @param {Object} props - As propriedades do componente.
+ * @param {boolean} props.open - Flag que indica se o diálogo está aberto.
+ * @param {Function} props.handleClose - Função para fechar o diálogo.
+ * @exemplo
+ * return <ConfirmarVenda open={open} handleClose={handleClose} />;
+ */
+export default function ConfirmarVenda({ open, handleClose }) {
   const nomeProduto = useVendaStore((state) => state.nomeProduto);
   const quantidade = useVendaStore((state) => state.quantidade);
   const precoTotal = useVendaStore((state) => state.precoTotal);
   const setDataVenda = useVendaStore((state) => state.setData);
   const clearStore = useVendaStore((state) => state.setClearVendaStore)
-  const navigate = useNavigate();
-  const timer = () => {
-    setTimeout(() => {
-      navigate("/");  // Redireciona após o tempo definido
-      window.scrollTo({
-        top: 0,
-        behavior: 'auto' // Isso adiciona uma rolagem suave
-    });
-    }, 2000);
-  };
 
+  /**
+   * Lida com a confirmação de uma venda, atualizando o estoque do produto e criando um registro de venda na base de dados.
+   * 
+   * @async
+   * @returns {Promise<void>} Uma promessa indicando a conclusão da confirmação da venda.
+   */
   async function handleConfirmar() {
-    // Obtendo a data e salvando no Zustand
     const dataAtual = new Date();
-    setDataVenda(dataAtual); // Salva a data atual no Zustand
+    setDataVenda(dataAtual);
     const estadoAtual = useVendaStore.getState();
-    console.log(estadoAtual);
-
-    console.log("Teste:", estadoAtual.produtoPosVenda._id);
     const idProduto = estadoAtual.produtoPosVenda._id;
-
     const produtoVendido = { 
       nomeProduto: estadoAtual.produtoPosVenda.nomeProduto,
       preco: estadoAtual.produtoPosVenda.preco,
@@ -151,38 +162,36 @@ export default function ConfirmarVenda({ open, handleClose, showSnackBar }) {
       nomeLoja: "Loja A",
       nomeProduto: nomeProduto,
       quantidade: quantidade,
-
-
-
-      data: dataAtual, //OBSERVAÇÃO: VALIDAR "dataAtual"
-
-
-
+      data: dataAtual,
       precoTotal: precoTotal      
-    }
-    console.log("produtoPostVenda: ", produtoPostVenda);
+    };
 
+    /**
+     * Pós-processa a venda após a confirmação, atualizando o estoque do produto, postando a venda e atualizando os dados.
+     * 
+     * @async
+     * @param {Object} produtoVendido - Os detalhes do produto após a venda.
+     * @param {string} idProduto - O ID do produto.
+     * @param {Object} produtoPostVenda - Os dados da venda a ser postada.
+     * @returns {Promise<void>} Uma promessa indicando a conclusão do pós-processamento da venda.
+     */
     async function posConfirmarVenda(produtoVendido, idProduto, produtoPostVenda) {
       await fetchProdutos();
       await putProduto(produtoVendido, idProduto);
       await fetchVendas();
       await postVenda(produtoPostVenda);
-    }
+    };
 
     await posConfirmarVenda(produtoVendido, idProduto, produtoPostVenda);
 
     clearStore();
-    timer();
-    window.location.reload();//Tentar mudar 
-    handleClose(); // Fecha o modal após salvar a data
-    showSnackbar("Venda registrada com sucesso!");
-    
+    window.location.reload();
+    handleClose();
   };
 
-  React.useEffect(() => { //parametro -> Flag 
+  React.useEffect(() => {
     fetchProdutos();
     }, []);
-  
 
   return (
     <BootstrapDialog

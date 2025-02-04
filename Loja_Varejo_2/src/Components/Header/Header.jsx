@@ -10,11 +10,10 @@ export default function ButtonAppBar() {
           backgroundColor: 'red', 
           boxShadow: 3, 
           borderRadius: '10px', 
-          margin: '0 16 16 px', // Espaçamento das bordas da tela
+          margin: '0 16 16 px',
         }}
       >
         <Toolbar sx={{ padding: '0 16px' }}>
-          {/* Título com ajuste de fonte */}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 'bold', fontSize: '1.25rem' }}>
             Loja B, A melhor loja para comprar coisas que a Loja B vende
           </Typography>

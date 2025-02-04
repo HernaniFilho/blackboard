@@ -3,10 +3,9 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { alignProperty } from '@mui/material/styles/cssUtils';
 
 export default function SelectQTD({ value, onChangeQuantity, maxQuantidade}) {
-  const [qtd, setQtd] = React.useState('');
+  const [qtd, setQtd] = React.useState(value || "");
 
   const handleChange = (event) => {
     const selectedQtd = event.target.value;
@@ -40,7 +39,7 @@ export default function SelectQTD({ value, onChangeQuantity, maxQuantidade}) {
         <Select
           labelId="demo-simple-select-autowidth-label"
           id="demo-simple-select-autowidth"
-          value={value}
+          value={value || ""}
           onChange={handleChange}
           autoWidth
           label="Qtd"
