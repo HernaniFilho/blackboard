@@ -165,14 +165,14 @@ function Produto() {
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:3000/api/notify");
 
-    eventSource.onmessage = (event) => {
+    eventSource.addEventListener("change", async (event) => {
       try {
         const payload = JSON.parse(event.data);
-        fetchProdutos();
+        await fetchProdutos();
       } catch (err) {
         console.error("Erro ao processar evento SSE:", err);
       }
-    };
+    });
 
     eventSource.onerror = (error) => {
       console.error("Erro SSE:", error);
