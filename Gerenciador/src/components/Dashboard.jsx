@@ -57,17 +57,34 @@ function Dashboard() {
   const [quantidadeTransferencia, setQuantidadeTransferencia] = useState(0);
   const [quantidadeCompra, setQuantidadeCompra] = useState(0);
 
+  /**
+   * Função para criar um atraso temporário.
+   * @param {number} ms - O tempo em milissegundos para o atraso.
+   * @returns {Promise<void>} Uma Promise que resolve após o tempo especificado.
+   */
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+  /**
+   * Manipula a mudança de página na tabela de produtos.
+   * @param {object} event - O evento de clique.
+   * @param {number} newPage - O número da nova página.
+   */
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
+  /**
+   * Manipula a alteração da quantidade de linhas por página.
+   * @param {object} event - O evento de alteração.
+   */
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
+  /**
+   * Gera sugestões de estoque baixo com base nos produtos atuais.
+   */
   const gerarSugestao = () => {
     const currentProdutos = useProdutosStore.getState().produtos;
     const produtosBaixos = currentProdutos.filter(
@@ -87,6 +104,10 @@ function Dashboard() {
     initialize();
   }, []);
 
+  /**
+   * Abre o modal para registrar uma transferência de produto.
+   * @param {Object} produto - O produto a ser transferido.
+   */
   const handleTransferencia = (produto) => {
     setProdutoSelecionado(produto);
     const sugestao = sugestoesMap.get(produto.nomeProduto);
@@ -98,6 +119,9 @@ function Dashboard() {
     setOpenTransferModal(true);
   };
 
+  /**
+   * Confirma a transferência de um produto entre lojas.
+   */
   const confirmarTransferencia = async () => {
     const sugestao = sugestoesMap.get(produtoSelecionado.nomeProduto);
     if (sugestao && quantidadeTransferencia > 0) {
@@ -105,10 +129,11 @@ function Dashboard() {
         sugestao.quantidade - sugestao.estoqueMin;
 
       if (quantidadeTransferencia <= quantidadeMaximaPermitida) {
-        await registraTransferencia(produtoSelecionado, {
-          ...sugestao,
-          quantidadeTransferencia,
-        });
+        await registraTransferencia(
+          produtoSelecionado,
+          sugestao,
+          quantidadeTransferencia
+        );
         showSnackbar("Transferência registrada com sucesso!", "success");
         gerarSugestao();
       } else {
@@ -126,12 +151,19 @@ function Dashboard() {
     setOpenTransferModal(false);
   };
 
+  /**
+   * Abre o modal para registrar uma nova compra de produto.
+   * @param {Object} produto - O produto a ser comprado.
+   */
   const handleCompra = (produto) => {
     setProdutoSelecionado(produto);
     setQuantidadeCompra(produto.estoqueMin * 2);
     setOpenCompraModal(true);
   };
 
+  /**
+   * Confirma a compra de um produto.
+   */
   const confirmarCompra = async () => {
     try {
       const comprado = await registraCompra(
