@@ -5,10 +5,33 @@ const CompraProxyService = require('../../KnowledgeSource/middleware/compraMiddl
 const compraProxyMiddleware = new CompraProxyService(Compra);
 
 const router = express.Router();
+/**
+
+@file compra.js
+
+@description Rotas para gerenciamento de compras.
+*/
+/**
+
+@route POST /
+
+@description Cria uma nova compra e atualiza o cache.
+*/
 //gerenciador consegue adicionar 
 router.post('/',(req,res,next)=>compraProxyMiddleware.criaCompra(req,res,next),(req,res)=>compraProxyMiddleware.updateCompraCache(req,res));
+/**
 
+@route GET /
+
+@description Lista todas as compras e atualiza o cache.
+*/
 router.get('/',(req,res,next)=>compraProxyMiddleware.listCompra(req,res,next),(req,res)=>compraProxyMiddleware.updateCacheCompra(req,res));
+/**
+
+@route DELETE /:id
+
+@description Deleta uma compra pelo ID e atualiza o cache.
+*/
 //gerenciador consegue deletar 
 router.delete('/:id',(req,res,next)=>compraProxyMiddleware.deleteCompra(req,res,next),(req,res)=>compraProxyMiddleware.updateDelete(req,res));
 

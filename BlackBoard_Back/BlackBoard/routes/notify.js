@@ -1,9 +1,19 @@
 const express = require('express');
 const router = express.Router();
+/**
 
+@file notify.js
+
+@description Rotas para notificações via Server-Sent Events (SSE).
+*/
 //Clientes conectados por SSE
 const clients = new Set();
+/**
 
+@route GET /
+
+@description Estabelece uma conexão SSE com o cliente.
+*/
 router.get('/', (req, res) => {
     // Configura os cabeçalhos CORS para permitir acesso de outras origens
     res.setHeader('Access-Control-Allow-Origin', '*'); // Ou defina a origem específica
