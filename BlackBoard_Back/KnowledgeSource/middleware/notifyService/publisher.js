@@ -4,12 +4,12 @@
 class publisher {
     /**
      * Cria um publicador.
-     * @param {Array} clients - Os clientes a serem notificados.
+     * @param {Set} clients - Os clientes a serem notificados.
      * @param {Object} ProductModel - O modelo de produto.
      */
     constructor(clients,ProductModel){
         /**
-         * @type {Array}
+         * @type {Set}
          * @description Os clientes a serem notificados.
          */
         this.clients = clients;
@@ -33,8 +33,6 @@ class publisher {
         const flag = true;
         this.notifyChange(flag);
     }
-    
-    ////////////////////////////////////////////
 /**
      * Notifica os clientes de um evento de mudança.
      * @param {boolean} flag - A flag indicando a mudança.

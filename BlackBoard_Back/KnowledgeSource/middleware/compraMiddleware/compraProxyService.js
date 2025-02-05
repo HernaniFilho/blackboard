@@ -66,13 +66,6 @@ class CompraProxyService extends iCompraService {
         const comprasEmLoja = this.compras.filter(compras => compras.nomeLoja === loja);
         res.status(201).json(comprasEmLoja);
     }
-    /*
-    nao implementado
-    async updateCompra(req, res, next) {
-        this.alterado = true;
-        await this.compraMiddleware.updateCompra(req, res, next);
-    }
-        */
 /**
  * @method deleteCompra
  * @description Deleta uma compra.

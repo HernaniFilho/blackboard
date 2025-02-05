@@ -67,18 +67,6 @@ class CompraMiddleware extends iCompraService {
         const comprasEmLoja = this.compras.filter(compras => compras.nomeLoja === loja);
         res.status(201).json(comprasEmLoja);
     }
-    /*
-    não implementaddo
-    async updateCompra(req, res, next) {
-
-        try {
-            await this.compra.findByIdAndUpdate(req.params.id, req.body, { new: true });
-            return next();
-        } catch (err) {
-            res.status(500).json({ error: err.message });
-        }
-    }
-        */
 /**
  * @method deleteCompra
  * @description Deleta uma compra do banco de dados.
