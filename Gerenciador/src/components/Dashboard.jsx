@@ -1,7 +1,12 @@
+/**
+ * Dashboard para gerenciamento de estoque de produtos.
+ * Permite verificar o estoque, sugerir transferências e registrar compras.
+ */
 import { useEffect, useState, useRef } from "react";
 import useProdutosStore from "../state/ProdutoStore";
 import useVerificaEstoque from "../Gerenciador/VerificaEstoque";
 import useRegistraTransferencia from "../Gerenciador/RegistraTransferencia";
+import useRegistraCompra from "../Gerenciador/RegistraCompra";
 import theme from "../assets/palette";
 import useSnackbar from "../assets/alert";
 import {
@@ -14,12 +19,12 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
 } from "@mui/material";
-import useRegistraCompra from "../Gerenciador/RegistraCompra";
-
-/**
- * @type {Array<{id: string, label: string, minWidth: number, align: "right" | "center" | "left" | undefined}>}
- */
 
 const columns = [
   { id: "nomeProduto", label: "Nome", minWidth: 150 },
@@ -31,10 +36,8 @@ const columns = [
 ];
 
 /**
- * Componente responsável por exibir o dashboard de gerenciamento de estoque.
- * Ele permite verificar o estoque de produtos, sugerir transferências e registrar compras.
- *
- * @returns {JSX.Element} O componente do dashboard.
+ * Componente principal do Dashboard.
+ * @component
  */
 function Dashboard() {
   const [page, setPage] = useState(0);
@@ -47,16 +50,20 @@ function Dashboard() {
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   const [baixo, setBaixo] = useState([]);
 
+  const [openModal, setOpenModal] = useState(false);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
+  const [quantidade, setQuantidade] = useState(0);
+
   /**
-   * Função para simular um atraso na execução.
-   * @param {number} ms - O tempo em milissegundos para o atraso.
-   * @returns {Promise<void>} Uma promessa que resolve após o atraso.
+   * Função auxiliar para criar um atraso.
+   * @param {number} ms - Tempo em milissegundos.
+   * @returns {Promise<void>}
    */
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   /**
-   * Atualiza a página da tabela.
-   * @param {React.MouseEvent<HTMLButtonElement>} event - Evento de clique.
+   * Manipula a mudança de página na tabela.
+   * @param {object} event - Evento de mudança.
    * @param {number} newPage - Nova página selecionada.
    */
   const handleChangePage = (event, newPage) => {
@@ -64,8 +71,8 @@ function Dashboard() {
   };
 
   /**
-   * Atualiza o número de linhas exibidas por página na tabela.
-   * @param {React.ChangeEvent<HTMLInputElement>} event - Evento de mudança do seletor.
+   * Manipula a alteração da quantidade de linhas por página.
+   * @param {object} event - Evento de alteração.
    */
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
@@ -73,7 +80,11 @@ function Dashboard() {
   };
 
   /**
-   * Gera sugestões de transferência de estoque com base nos produtos abaixo do estoque mínimo.
+   * Gera sugestões de transferência de estoque para produtos com estoque baixo.
+   * Chama a função VerificaEstoque que retorna um Map com os produtos abaixo
+   *  e possíveis sugestões de transferência para poduto,
+   * assim como a quantidade a ser transferida
+   *
    */
   const gerarSugestao = () => {
     const currentProdutos = useProdutosStore.getState().produtos;
@@ -94,6 +105,57 @@ function Dashboard() {
     initialize();
   }, []);
 
+  /**
+   * Registra a transferência de produtos entre lojas.
+   * @param {Object} produto - Produto a ser transferido.
+   */
+  const handleTransferencia = async (produto) => {
+    const sugestao = sugestoesMap.get(produto.nomeProduto);
+    if (sugestao) {
+      registraTransferencia(produto, sugestao);
+      showSnackbar("Transferência registrada com sucesso!", "success");
+    } else {
+      showSnackbar(
+        "Nenhuma sugestão disponível para transferência.",
+        "warning"
+      );
+    }
+    await delay(500);
+    gerarSugestao();
+  };
+
+  /**
+   * Abre o modal para definir a quantidade de compra de um produto.
+   * @param {Object} produto - Produto selecionado para compra.
+   */
+  const handleCompra = (produto) => {
+    setProdutoSelecionado(produto);
+    setQuantidade(produto.estoqueMin * 2); // Sugestão padrão
+    setOpenModal(true);
+  };
+
+  /**
+   * Confirma a compra do produto selecionado.
+   */
+  const confirmarCompra = async () => {
+    try {
+      const comprado = await registraCompra(produtoSelecionado, quantidade);
+      if (comprado) {
+        showSnackbar("Compra registrada com sucesso!", "success");
+      } else {
+        showSnackbar("Fornecedor não encontrado para este produto", "error");
+      }
+    } catch (error) {
+      showSnackbar("Erro inesperado ao registrar a compra", "error");
+    }
+    setOpenModal(false);
+    await delay(500);
+    gerarSugestao();
+  };
+
+  /**
+   * Garante que a variável utilizada por gerarSugestão é a mais atualizada
+   */
   const gerarSugestaoRef = useRef(() => {});
   useEffect(() => {
     gerarSugestaoRef.current = gerarSugestao;
@@ -101,6 +163,7 @@ function Dashboard() {
 
   /**
    * Configura a conexão com o servidor para receber notificações em tempo real (SSE).
+   * É o método subscriber do padrão Observer
    */
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:3000/api/notify");
@@ -123,44 +186,6 @@ function Dashboard() {
       eventSource.close();
     };
   }, []);
-
-  /**
-   * Registra a transferência de estoque para o produto selecionado.
-   * @param {Object} produto - O produto para o qual a transferência será registrada.
-   */
-  const handleTransferencia = async (produto) => {
-    const sugestao = sugestoesMap.get(produto.nomeProduto);
-    if (sugestao) {
-      registraTransferencia(produto, sugestao);
-      showSnackbar("Transferência registrada com sucesso!", "success");
-    } else {
-      showSnackbar(
-        "Nenhuma sugestão disponível para transferência.",
-        "warning"
-      );
-    }
-    await delay(500);
-    gerarSugestao();
-  };
-
-  /**
-   * Registra uma nova compra para o produto selecionado.
-   * @param {Object} produto - O produto para o qual a compra será registrada.
-   */
-  const handleCompra = async (produto) => {
-    try {
-      const comprado = await registraCompra(produto, produto.estoqueMin * 2);
-      if (comprado) {
-        showSnackbar("Compra registrada com sucesso!", "success");
-      } else {
-        showSnackbar("Fornecedor não encontrado para este produto", "error");
-      }
-    } catch (error) {
-      showSnackbar("Erro inesperado ao registrar a compra", "error");
-    }
-    await delay(500);
-    gerarSugestao();
-  };
 
   return (
     <div>
@@ -255,6 +280,29 @@ function Dashboard() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
+
+      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+        <DialogTitle>Definir Quantidade de Compra</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Quantidade"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={quantidade}
+            onChange={(e) => setQuantidade(Number(e.target.value))}
+            inputProps={{ min: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenModal(false)}>Cancelar</Button>
+          <Button variant="contained" onClick={confirmarCompra} color="primary">
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <SnackbarComponent />
     </div>
