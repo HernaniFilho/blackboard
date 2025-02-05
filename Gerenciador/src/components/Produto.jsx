@@ -96,6 +96,7 @@ const schema = yup.object().shape({
     .number()
     .typeError("A quantidade deve ser um número")
     .min(0, "A quantidade deve ser maior que zero")
+    .max(500, "A quantidade não pode exceder 500")
     .integer("A quantidade deve ser um número inteiro")
     .required("A quantidade é obrigatória"),
   estoqueMin: yup
@@ -189,23 +190,40 @@ function Produto() {
       <StickyHeadTable columns={columns} rows={produtos} pageType="orders" />
 
       {/* Botão flutuante para abrir o modal de adição de produto */}
-      <Fab
-        sx={{
-          color: theme.palette.custom.navy,
-          "&:hover": { backgroundColor: theme.palette.custom.teal },
-        }}
-        aria-label="add"
-        onClick={handleOpen}
-      >
-        <AddIcon />
-      </Fab>
+      <div style={{ padding: "16px" }}>
+        <Fab
+          sx={{
+            color: theme.palette.custom.navy,
+            "&:hover": {
+              backgroundColor: theme.palette.custom.teal,
+            },
+          }}
+          aria-label="add"
+          onClick={handleOpen}
+        >
+          <AddIcon />
+        </Fab>
+      </div>
 
       {/* Modal de adição de produto */}
-      <Modal open={open} onClose={handleClose}>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="child-modal-title"
+        aria-describedby="child-modal-description"
+      >
         <Box sx={style}>
-          <h2>Adicionar novo Produto</h2>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            {/* Campo: Nome do Produto */}
+          <h2
+            id="child-modal-title"
+            style={{ textAlign: "center", marginBottom: "16px" }}
+          >
+            Adicionar novo Produto
+          </h2>
+          <form
+            style={{ width: "100%" }}
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+          >
             <Controller
               name="nomeProduto"
               control={control}
@@ -217,31 +235,104 @@ function Produto() {
                   variant="outlined"
                   error={!!errors.nomeProduto}
                   helperText={errors.nomeProduto?.message}
+                  sx={{ mt: 2 }}
                 />
               )}
             />
 
-            {/* Campo: Preço */}
-            <Controller
-              name="preco"
-              control={control}
-              render={({ field }) => (
-                <FormControl fullWidth>
-                  <InputLabel>Preço</InputLabel>
-                  <OutlinedInput
-                    {...field}
-                    startAdornment={
-                      <InputAdornment position="start">R$</InputAdornment>
-                    }
-                    label="Preço"
-                    error={!!errors.preco}
-                  />
-                </FormControl>
-              )}
-            />
+            <Box sx={{ display: "flex", gap: 3, width: "100%", mt: 2 }}>
+              <Controller
+                name="preco"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel htmlFor="outlined-adornment-amount">
+                      Preço
+                    </InputLabel>
+                    <OutlinedInput
+                      {...field}
+                      startAdornment={
+                        <InputAdornment position="start">R$</InputAdornment>
+                      }
+                      label="Preço"
+                      error={!!errors.preco}
+                    />
+                    <span style={{ color: "red", fontSize: "12px" }}>
+                      {errors.preco?.message}
+                    </span>
+                  </FormControl>
+                )}
+              />
 
-            {/* Botão de envio do formulário */}
-            <Button type="submit">Adicionar</Button>
+              <Controller
+                name="nomeLoja"
+                control={control}
+                render={({ field }) => (
+                  <FormControl fullWidth>
+                    <InputLabel>Loja</InputLabel>
+                    <Select {...field} error={!!errors.nomeLoja}>
+                      <MenuItem value="Loja A">Loja A</MenuItem>
+                      <MenuItem value="Loja B">Loja B</MenuItem>
+                    </Select>
+                    <span style={{ color: "red", fontSize: "12px" }}>
+                      {errors.nomeLoja?.message}
+                    </span>
+                  </FormControl>
+                )}
+              />
+            </Box>
+
+            <Box sx={{ display: "flex", gap: 3, width: "100%", mt: 2 }}>
+              <Controller
+                name="quantidade"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Quantidade"
+                    type="number"
+                    variant="outlined"
+                    error={!!errors.quantidade}
+                    helperText={errors.quantidade?.message}
+                  />
+                )}
+              />
+              <Controller
+                name="estoqueMin"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    fullWidth
+                    label="Estoque Mínimo"
+                    type="number"
+                    variant="outlined"
+                    error={!!errors.estoqueMin}
+                    helperText={errors.estoqueMin?.message}
+                  />
+                )}
+              />
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                mt: 3,
+              }}
+            >
+              <Button
+                sx={{ color: theme.palette.custom.navy }}
+                onClick={handleClose}
+              >
+                Fechar
+              </Button>
+              <Button sx={{ color: theme.palette.custom.green }} type="submit">
+                Adicionar
+              </Button>
+            </Box>
           </form>
         </Box>
       </Modal>

@@ -303,7 +303,15 @@ function Dashboard() {
         />
       </Paper>
 
-      <Dialog open={openCompraModal} onClose={() => setOpenCompraModal(false)}>
+      <Dialog
+        open={openCompraModal}
+        onClose={() => setOpenCompraModal(false)}
+        sx={{
+          "& .MuiPaper-root": {
+            backgroundColor: theme.palette.custom.skyBlue, // Apply your custom color here
+          },
+        }}
+      >
         <DialogTitle>Definir Quantidade de Compra</DialogTitle>
         <DialogContent>
           {produtoSelecionado && (
@@ -324,8 +332,20 @@ function Dashboard() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenCompraModal(false)}>Cancelar</Button>
-          <Button variant="contained" onClick={confirmarCompra} color="primary">
+          <Button
+            onClick={() => setOpenCompraModal(false)}
+            sx={{ color: theme.palette.custom.navy }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            variant="contained"
+            onClick={confirmarCompra}
+            sx={{
+              color: theme.palette.custom.beige,
+              backgroundColor: theme.palette.custom.green,
+            }}
+          >
             Confirmar
           </Button>
         </DialogActions>
@@ -334,6 +354,11 @@ function Dashboard() {
       <Dialog
         open={openTransferModal}
         onClose={() => setOpenTransferModal(false)}
+        sx={{
+          "& .MuiPaper-root": {
+            backgroundColor: theme.palette.custom.skyBlue,
+          },
+        }}
       >
         <DialogTitle>Definir Quantidade de Transferência</DialogTitle>
         <DialogContent>
@@ -361,11 +386,19 @@ function Dashboard() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenTransferModal(false)}>Cancelar</Button>
+          <Button
+            onClick={() => setOpenTransferModal(false)}
+            sx={{ color: theme.palette.custom.navy }}
+          >
+            Cancelar
+          </Button>
           <Button
             variant="contained"
             onClick={confirmarTransferencia}
-            color="primary"
+            sx={{
+              color: theme.palette.custom.beige,
+              backgroundColor: theme.palette.custom.green,
+            }}
           >
             Confirmar
           </Button>

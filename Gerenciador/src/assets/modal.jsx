@@ -53,6 +53,7 @@ const getSchema = (pageType) => {
         .number()
         .typeError("A quantidade deve ser um número")
         .min(0, "A quantidade deve ser positiva")
+        .max(500, "A quantidade não pode exceder 500")
         .required("A quantidade é obrigatória"),
       estoqueMin: yup
         .number()
