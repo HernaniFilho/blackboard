@@ -1,8 +1,14 @@
 const iVendaService = require('./iVendaService');
 const VendaMiddleware = require('./vendaMiddleware');
-
+/**
+ * Classe que representa um serviço proxy para vendas.
+ * Extende a interface iVendaService.
+ */
 class VendaProxyService extends iVendaService {
-
+/**
+     * Cria uma instância de VendaProxyService.
+     * @param {Object} VendaModel - O modelo de venda.
+     */
     constructor(VendaModel) {
         super();
         this.VendaMiddleware = new VendaMiddleware(VendaModel);
@@ -15,11 +21,24 @@ class VendaProxyService extends iVendaService {
         this.deleteVenda = this.deleteVenda.bind(this);
         this.updateVendaCache =this.updateVendaCache.bind(this);
     }
-
+/**
+     * Adiciona uma venda.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async addVenda(req, res, next) {
         this.alterado = true;
         await this.VendaMiddleware.addVenda(req, res, next);
     }
+    /**
+     * Lista as vendas.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async listVenda(req, res, next) {
         //const loja = req.headers.nomeloja;
 
@@ -31,16 +50,36 @@ class VendaProxyService extends iVendaService {
             res.status(200).json(this.vendas);//VendasEmLoja
         }
     }
-
+/**
+     * Atualiza o cache de vendas.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateCacheVendas(req, res, next) {
         this.vendas = req.vendas;
         this.alterado = false;
         res.status(201).json(this.vendas);
     }
+    /**
+     * Atualiza uma venda.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateVenda(req, res, next) {
         this.alterado = true;
         await this.VendaMiddleware.updateVenda(req, res, next);
     }
+    /**
+     * Atualiza o cache de vendas após uma atualização.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateVendaCache(req, res, next) {
         this.alterado = false;
         const Venda = req.vendas;
@@ -50,13 +89,24 @@ class VendaProxyService extends iVendaService {
         this.vendas[index] = Venda;
         res.status(201).json(Venda);
     }
-
-    
+    /**
+     * Deleta uma venda.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async deleteVenda(req, res, next) {
         this.alterado = true;
         await this.VendaMiddleware.deleteVenda(req, res, next);
     }
-
+/**
+     * Atualiza a lista de vendas após uma exclusão.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateDelete(req, res, next) {
         this.alterado = false;
         const Venda = req.body;
@@ -65,6 +115,13 @@ class VendaProxyService extends iVendaService {
         this.vendas.splice(index, 1);
         res.status(201).json({ message: 'Venda removido com sucesso!' });
     }
+    /**
+     * Adiciona uma venda ao cache.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async addVendaCache(req, res, next) {
         const VendaAtualizado = req.vendas;
         const index = this.vendas.push(VendaAtualizado);

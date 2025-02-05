@@ -1,5 +1,12 @@
 const iCompraService = require('./iCompraService');
+/**
 
+@class CompraMiddleware
+
+@extends iCompraService
+
+@description Middleware para operações CRUD de compras.
+*/
 class CompraMiddleware extends iCompraService {
     constructor(compraModel) {
         super();
@@ -10,7 +17,13 @@ class CompraMiddleware extends iCompraService {
         //this.updateCompra = this.updateCompra.bind(this);
         this.deleteCompra = this.deleteCompra.bind(this);
     }
-
+/**
+ * @method criaCompra
+ * @description Cria uma nova compra no banco de dados.
+ * @param {Request} req - Requisição HTTP.
+ * @param {Response} res - Resposta HTTP.
+ * @param {Function} next - Middleware seguinte.
+ */
     async criaCompra(req, res, next) {
         try {
             const compra = new this.Compra(req.body);
@@ -22,6 +35,13 @@ class CompraMiddleware extends iCompraService {
             res.status(500).json({ error: err.message });
         }
     }
+/**
+ * @method listCompra
+ * @description Lista todas as compras do banco de dados.
+ * @param {Request} req - Requisição HTTP.
+ * @param {Response} res - Resposta HTTP.
+ * @param {Function} next - Middleware seguinte.
+ */
     async listCompra(req, res, next) {
 
         try {
@@ -33,6 +53,12 @@ class CompraMiddleware extends iCompraService {
             res.status(500).json({ error: err.message });
         }
     }
+/**
+ * @method updateCacheCompra
+ * @description Atualiza o cache com as compras recentes.
+ * @param {Request} req - Requisição HTTP.
+ * @param {Response} res - Resposta HTTP.
+ */
     async updateCacheCompra(req, res, next) {
         this.compras = req.compras;
         this.alterado = false;
@@ -53,6 +79,13 @@ class CompraMiddleware extends iCompraService {
         }
     }
         */
+/**
+ * @method deleteCompra
+ * @description Deleta uma compra do banco de dados.
+ * @param {Request} req - Requisição HTTP.
+ * @param {Response} res - Resposta HTTP.
+ * @param {Function} next - Middleware seguinte.
+ */
     async deleteCompra(req, res, next) {
         try {
             await this.Compra.findByIdAndDelete(req.params.id);

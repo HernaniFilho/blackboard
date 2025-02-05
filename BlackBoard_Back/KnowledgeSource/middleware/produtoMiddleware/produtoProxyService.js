@@ -1,8 +1,14 @@
 const iProdutoService = require('./iProdutoService');
 const ProdutoMiddleware = require('./produtoMiddleware');
-
+/**
+ * Classe que representa um serviço proxy para produtos.
+ * Extende a interface iProdutoService.
+ */
 class produtoProxyService extends iProdutoService {
-
+/**
+     * Cria uma instância de produtoProxyService.
+     * @param {Object} produtoModel - O modelo de produto.
+     */
     constructor(produtoModel) {
         super();
         this.produtoMiddleware = new ProdutoMiddleware(produtoModel);
@@ -14,11 +20,24 @@ class produtoProxyService extends iProdutoService {
         this.updateProduto = this.updateProduto.bind(this);
         this.deleteProduto = this.deleteProduto.bind(this);
     }
-
+/**
+     * Adiciona um produto.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async addProduto(req, res, next) {
         this.alterado = true;
         await this.produtoMiddleware.addProduto(req, res, next);
     }
+    /**
+     * Lista os produtos.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async listProduto(req, res, next) {
         const loja = req.headers.nomeloja;
         var produtosEmLoja = [];
@@ -34,7 +53,13 @@ class produtoProxyService extends iProdutoService {
             res.status(200).json(produtosEmLoja);
         }
     }
-
+/**
+     * Atualiza o cache de produtos.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateCacheprodutos(req, res, next) {
         this.produtos = req.produtos;
         this.alterado = false;
@@ -47,7 +72,13 @@ class produtoProxyService extends iProdutoService {
         }
         res.status(201).json(produtosEmLoja);
     }
-
+/**
+     * Atualiza um produto.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateProduto(req, res, next) {
         this.alterado = true;
         const nomeAlteracao = req.body.nomeProduto;
@@ -73,11 +104,24 @@ class produtoProxyService extends iProdutoService {
             this.produtos[index] = produtoAtualizado;
             res.status(201).json(req.body);
     }
+    /**
+     * Deleta um produto.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async deleteProduto(req, res, next) {
         this.alterado = true;
         await this.produtoMiddleware.deleteProduto(req, res, next);
     }
-
+/**
+     * Atualiza a lista de produtos após uma exclusão.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateDelete(req, res, next) {
         this.alterado = true;
         //const HEADER = req.headers.nomeloja;
@@ -90,7 +134,13 @@ class produtoProxyService extends iProdutoService {
         }
         res.status(201).json({ message: 'Produto removido com sucesso!' });
     }
-
+/**
+     * Adiciona um produto ao cache.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async addProdutoCache(req, res, next) {
         const novoProduto = req.produtos;
         const index = this.produtos.push(novoProduto);

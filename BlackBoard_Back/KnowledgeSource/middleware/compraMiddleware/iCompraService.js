@@ -1,3 +1,11 @@
+/**
+
+@interface iCompraService
+
+@description Interface para o serviço de compra, definindo métodos obrigatórios que devem ser implementados.
+
+@throws {Error} Se tentar instanciar diretamente ou se um método obrigatório não for implementado.
+*/
 const requiredMethods = [
     "criaCompra",
     "listCompra",

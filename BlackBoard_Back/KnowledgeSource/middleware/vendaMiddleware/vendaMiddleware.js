@@ -1,6 +1,13 @@
 const iVendaService = require('./iVendaService');
-
+/**
+ * Classe que representa o middleware de venda.
+ * Extende a interface iVendaService.
+ */
 class VendaMiddleware extends iVendaService {
+    /**
+     * Cria uma instância de VendaMiddleware.
+     * @param {Object} VendaModel - O modelo de venda.
+     */
     constructor(VendaModel) {
         super();
         this.Venda = VendaModel;
@@ -9,7 +16,13 @@ class VendaMiddleware extends iVendaService {
         this.updateVenda = this.updateVenda.bind(this);
         this.deleteVenda = this.deleteVenda.bind(this);
     }
-
+/**
+     * Adiciona uma venda.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async addVenda(req, res, next) {
         try {
             const Venda = new this.Venda(req.body);
@@ -23,6 +36,13 @@ class VendaMiddleware extends iVendaService {
             res.status(500).json({ error: err.message });
         }
     }
+    /**
+     * Lista as vendas.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async listVenda(req, res, next) {
         try {
             const Vendas = await this.Venda.find();
@@ -32,6 +52,13 @@ class VendaMiddleware extends iVendaService {
             res.status(500).json({ error: err.message });
         }
     }
+    /**
+     * Atualiza uma venda.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async updateVenda(req, res, next) {
         try {
             const VendaALT = await this.Venda.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -42,6 +69,13 @@ class VendaMiddleware extends iVendaService {
             res.status(500).json({ error: err.message });
         }
     }
+    /**
+     * Deleta uma venda.
+     * @param {Object} req - O objeto de requisição.
+     * @param {Object} res - O objeto de resposta.
+     * @param {Function} next - A próxima função middleware.
+     * @returns {Promise<void>}
+     */
     async deleteVenda(req, res, next) {
         try {
             await this.Venda.findByIdAndDelete(req.params.id);
