@@ -21,9 +21,17 @@ function useRegistraTransferencia() {
    * @returns {Object} O objeto de transferência registrado.
    */
   const registraTransferencia = (recebido, transferido) => {
-    const quantidadeTransferida = Math.round(
-      (transferido.quantidade - transferido.estoqueMin) * 0.3
+    console.log(recebido);
+    console.log(transferido);
+    const quantidadeTransferida = Math.max(
+      Math.round((transferido.quantidade - transferido.estoqueMin) * 0.3)
     );
+
+    if (quantidadeTransferida === 0) {
+      console.warn("Não há estoque suficiente para transferir.");
+      return null; // Ou exibir uma notificação para o usuário
+    }
+    console.log(quantidadeTransferida);
     const transferencia = {
       lojaSaida: transferido.nomeLoja,
       lojaEntrada: recebido.nomeLoja,

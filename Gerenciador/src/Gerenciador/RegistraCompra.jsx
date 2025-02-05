@@ -28,16 +28,19 @@ function useRegistraCompra() {
   const registraCompra = async (produto, quantidade) => {
     await fetchFornecedores();
 
-    const fornecedor = fornecedores.find(
-      (fornecedor) => fornecedor.nomeProduto === produto.nomeProduto
+    // Otimização: cria um Map para busca rápida
+    const fornecedoresMap = new Map(
+      fornecedores.map((fornecedor) => [fornecedor.nomeProduto, fornecedor])
     );
+
+    const fornecedor = fornecedoresMap.get(produto.nomeProduto);
 
     if (fornecedor) {
       const compra = {
         nomeFornecedor: fornecedor.nomeFornecedor,
         nomeLoja: produto.nomeLoja,
         nomeProduto: produto.nomeProduto,
-        quantidade: quantidade,
+        quantidade,
         precoTotal: fornecedor.preco * quantidade,
         data: new Date(),
       };

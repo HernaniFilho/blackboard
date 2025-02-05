@@ -25,6 +25,7 @@ import {
   DialogActions,
   TextField,
 } from "@mui/material";
+import { Typography } from "@mui/material";
 
 const columns = [
   { id: "nomeProduto", label: "Nome", minWidth: 150 },
@@ -50,42 +51,23 @@ function Dashboard() {
   const { showSnackbar, SnackbarComponent } = useSnackbar();
   const [baixo, setBaixo] = useState([]);
 
-  const [openModal, setOpenModal] = useState(false);
+  const [openCompraModal, setOpenCompraModal] = useState(false);
+  const [openTransferModal, setOpenTransferModal] = useState(false);
   const [produtoSelecionado, setProdutoSelecionado] = useState(null);
-  const [quantidade, setQuantidade] = useState(0);
+  const [quantidadeTransferencia, setQuantidadeTransferencia] = useState(0);
+  const [quantidadeCompra, setQuantidadeCompra] = useState(0);
 
-  /**
-   * Função auxiliar para criar um atraso.
-   * @param {number} ms - Tempo em milissegundos.
-   * @returns {Promise<void>}
-   */
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-  /**
-   * Manipula a mudança de página na tabela.
-   * @param {object} event - Evento de mudança.
-   * @param {number} newPage - Nova página selecionada.
-   */
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  /**
-   * Manipula a alteração da quantidade de linhas por página.
-   * @param {object} event - Evento de alteração.
-   */
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(+event.target.value);
     setPage(0);
   };
 
-  /**
-   * Gera sugestões de transferência de estoque para produtos com estoque baixo.
-   * Chama a função VerificaEstoque que retorna um Map com os produtos abaixo
-   *  e possíveis sugestões de transferência para poduto,
-   * assim como a quantidade a ser transferida
-   *
-   */
   const gerarSugestao = () => {
     const currentProdutos = useProdutosStore.getState().produtos;
     const produtosBaixos = currentProdutos.filter(
@@ -105,66 +87,74 @@ function Dashboard() {
     initialize();
   }, []);
 
-  /**
-   * Registra a transferência de produtos entre lojas.
-   * @param {Object} produto - Produto a ser transferido.
-   */
-  const handleTransferencia = async (produto) => {
+  const handleTransferencia = (produto) => {
+    setProdutoSelecionado(produto);
     const sugestao = sugestoesMap.get(produto.nomeProduto);
-    if (sugestao) {
-      registraTransferencia(produto, sugestao);
-      showSnackbar("Transferência registrada com sucesso!", "success");
+    setQuantidadeTransferencia(
+      sugestao
+        ? Math.round((sugestao.quantidade - sugestao.estoqueMin) * 0.3)
+        : 0
+    );
+    setOpenTransferModal(true);
+  };
+
+  const confirmarTransferencia = async () => {
+    const sugestao = sugestoesMap.get(produtoSelecionado.nomeProduto);
+    if (sugestao && quantidadeTransferencia > 0) {
+      const quantidadeMaximaPermitida =
+        sugestao.quantidade - sugestao.estoqueMin;
+
+      if (quantidadeTransferencia <= quantidadeMaximaPermitida) {
+        await registraTransferencia(produtoSelecionado, {
+          ...sugestao,
+          quantidadeTransferencia,
+        });
+        showSnackbar("Transferência registrada com sucesso!", "success");
+        gerarSugestao();
+      } else {
+        showSnackbar(
+          `Quantidade excede o limite máximo permitido de ${quantidadeMaximaPermitida} unidades.`,
+          "warning"
+        );
+      }
     } else {
       showSnackbar(
-        "Nenhuma sugestão disponível para transferência.",
+        "Nenhuma sugestão disponível ou quantidade inválida.",
         "warning"
       );
     }
-    await delay(500);
-    gerarSugestao();
+    setOpenTransferModal(false);
   };
 
-  /**
-   * Abre o modal para definir a quantidade de compra de um produto.
-   * @param {Object} produto - Produto selecionado para compra.
-   */
   const handleCompra = (produto) => {
     setProdutoSelecionado(produto);
-    setQuantidade(produto.estoqueMin * 2); // Sugestão padrão
-    setOpenModal(true);
+    setQuantidadeCompra(produto.estoqueMin * 2);
+    setOpenCompraModal(true);
   };
 
-  /**
-   * Confirma a compra do produto selecionado.
-   */
   const confirmarCompra = async () => {
     try {
-      const comprado = await registraCompra(produtoSelecionado, quantidade);
+      const comprado = await registraCompra(
+        produtoSelecionado,
+        quantidadeCompra
+      );
       if (comprado) {
         showSnackbar("Compra registrada com sucesso!", "success");
       } else {
         showSnackbar("Fornecedor não encontrado para este produto", "error");
       }
     } catch (error) {
+      console.log(error);
       showSnackbar("Erro inesperado ao registrar a compra", "error");
     }
-    setOpenModal(false);
-    await delay(500);
-    gerarSugestao();
+    setOpenCompraModal(false);
   };
 
-  /**
-   * Garante que a variável utilizada por gerarSugestão é a mais atualizada
-   */
   const gerarSugestaoRef = useRef(() => {});
   useEffect(() => {
     gerarSugestaoRef.current = gerarSugestao;
   }, [gerarSugestao]);
 
-  /**
-   * Configura a conexão com o servidor para receber notificações em tempo real (SSE).
-   * É o método subscriber do padrão Observer
-   */
   useEffect(() => {
     const eventSource = new EventSource("http://localhost:3000/api/notify");
 
@@ -234,7 +224,7 @@ function Dashboard() {
                       hover
                       role="checkbox"
                       tabIndex={-1}
-                      key={produto.nomeProduto}
+                      key={produto._id}
                     >
                       <TableCell>{produto.nomeProduto}</TableCell>
                       <TableCell>{produto.nomeLoja}</TableCell>
@@ -281,9 +271,14 @@ function Dashboard() {
         />
       </Paper>
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)}>
+      <Dialog open={openCompraModal} onClose={() => setOpenCompraModal(false)}>
         <DialogTitle>Definir Quantidade de Compra</DialogTitle>
         <DialogContent>
+          {produtoSelecionado && (
+            <Typography variant="subtitle1" gutterBottom>
+              Quantidade Sugerida: {produtoSelecionado.estoqueMin * 2}
+            </Typography>
+          )}
           <TextField
             autoFocus
             margin="dense"
@@ -291,14 +286,55 @@ function Dashboard() {
             type="number"
             fullWidth
             variant="outlined"
-            value={quantidade}
-            onChange={(e) => setQuantidade(Number(e.target.value))}
+            value={quantidadeCompra}
+            onChange={(e) => setQuantidadeCompra(Number(e.target.value))}
             inputProps={{ min: 1 }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenModal(false)}>Cancelar</Button>
+          <Button onClick={() => setOpenCompraModal(false)}>Cancelar</Button>
           <Button variant="contained" onClick={confirmarCompra} color="primary">
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openTransferModal}
+        onClose={() => setOpenTransferModal(false)}
+      >
+        <DialogTitle>Definir Quantidade de Transferência</DialogTitle>
+        <DialogContent>
+          {produtoSelecionado && (
+            <Typography variant="subtitle1" gutterBottom>
+              Quantidade Sugerida:{" "}
+              {Math.round(
+                (sugestoesMap.get(produtoSelecionado.nomeProduto)?.quantidade -
+                  sugestoesMap.get(produtoSelecionado.nomeProduto)
+                    ?.estoqueMin) *
+                  0.3
+              ) || 0}
+            </Typography>
+          )}
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Quantidade"
+            type="number"
+            fullWidth
+            variant="outlined"
+            value={quantidadeTransferencia}
+            onChange={(e) => setQuantidadeTransferencia(Number(e.target.value))}
+            inputProps={{ min: 1 }}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenTransferModal(false)}>Cancelar</Button>
+          <Button
+            variant="contained"
+            onClick={confirmarTransferencia}
+            color="primary"
+          >
             Confirmar
           </Button>
         </DialogActions>
