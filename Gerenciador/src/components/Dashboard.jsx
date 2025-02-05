@@ -217,7 +217,7 @@ function Dashboard() {
                       <TableCell align="right">{produto.estoqueMin}</TableCell>
                       <TableCell>
                         {sugestao
-                          ? `Transferir de ${sugestao.nomeLoja} (${sugestao.quantidade} disponíveis)`
+                          ? `Transferir de ${sugestao.nomeLoja} ${Math.round((sugestao.quantidade - sugestao.estoqueMin) * 0.3)} unidades`
                           : "Sem sugestão"}
                       </TableCell>
                       <TableCell align="center">
