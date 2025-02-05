@@ -2,10 +2,9 @@ module.exports = {
   source: {
     include: [
       "../Blackboard/BlackBoard_Back/BlackBoard",
-      "../Blackboard/BlackBoard_Back/KnowledgeSource",
-      "../Blackboard/Gerenciador/src",
-      "../Blackboard/Loja_Varejo_1/src",
-      "../Blackboard/Loja_Varejo_2/src",
+      "../Blackboard/Gerenciador",
+      "../Blackboard/Loja_Varejo_1",
+      "../Blackboard/Loja_Varejo_2",
     ],
     includePattern: ".+\\.(js|jsx)$",
     excludePattern: "(node_modules|build|.*\\.env|.*\\.json)",

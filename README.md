@@ -12,7 +12,7 @@ deste trabalho foi utilizado um banco pessoal. Contudo, posteriormente deve ser 
 
 ## Como funciona o projeto?
 
-Uma vez iniciado o proejto conforme a primeira sessão deste README, três portas serão abertas:
+Uma vez iniciado o projeto conforme a primeira sessão deste README, três portas serão abertas:
 localhost:5173 - Gerenciador de Estoque
 localhost:5174 - Loja A
 localhost:5175 - Loja B

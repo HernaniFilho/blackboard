@@ -6,6 +6,11 @@ const compraProxyMiddleware = new CompraProxyService(Compra);
 
 const router = express.Router();
 /**
+ * @module BlackBoard
+ */
+/**
+ * 
+ * @memberof blackb 
 
 @file compra.js
 

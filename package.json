@@ -9,7 +9,8 @@
     "GER-BACK": "concurrently \"cd Gerenciador && npm run dev\" \"cd BlackBoard_Back/BlackBoard && npm run BACK\"",
     "LJ1-BACK": "concurrently \"cd Loja_Varejo_1 && npm run dev\" \"cd BlackBoard_Back/BlackBoard && npm run BACK\"",
     "start": "concurrently \"cd Gerenciador && npm run dev\" \"cd Loja_Varejo_1 && npm run dev\" \"cd Loja_Varejo_2 && npm run dev\"  \"cd BlackBoard_Back/BlackBoard && npm run BACK\"",
-    "docs": "jsdoc -c jsdoc.config.js"
+    "docs": "jsdoc -c jsdoc.config.js",
+    "readoc":"\"cd docs && start index.html\""
   },
   "author": "",
   "license": "ISC",
