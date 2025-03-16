@@ -19,3 +19,5 @@ localhost:5175 - Loja B
 
 Em cada loja é possível fazer uma venda dos produtos da mesma, mas antes é preciso preencher o banco de dados usando o gerenciador.
 Uma vez feito isso será possível usar as lojas A e B normalmente daqui em diante.
+
+Projeto feito em grupo
